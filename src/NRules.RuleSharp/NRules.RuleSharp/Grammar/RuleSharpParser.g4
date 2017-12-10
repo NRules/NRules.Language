@@ -1045,6 +1045,10 @@ keyword
     | VOID
     | VOLATILE
     | WHILE
+// Rule keywords
+    | RULE
+    | WHEN
+    | THEN
     ;
 
 // -------------------- extra rules for modularization --------------------------------
@@ -1166,14 +1170,27 @@ rule_declaration
   
 rule_name
     : identifier
+    | string_literal
     ;
 
-rule_description
-    : string_literal
+rule_attribute_list
+    : rule_attribute+
+    ;
+
+rule_attribute
+    : DESCRIPTION value=string_literal #rule_description
+    | PRIORITY value=INTEGER_LITERAL #rule_priority
+    | TAG values+=string_literal (',' values+=string_literal)* #rule_tags
+    ;
+
+rule_block
+    : OPEN_BRACE rule_body CLOSE_BRACE
     ;
 
 rule_body
-    : OPEN_BRACE WHEN rule_left_hand_side THEN rule_right_hand_side CLOSE_BRACE
+    : rule_attribute_list?
+      WHEN rule_left_hand_side
+      THEN rule_right_hand_side
     ;
 
 rule_left_hand_side
@@ -1193,6 +1210,6 @@ rule_action
     ;
 
 rule_definition
-    : RULE rule_name rule_description?
-        rule_body ';'?
+    : RULE rule_name
+      (rule_body | rule_block) ';'?
     ;

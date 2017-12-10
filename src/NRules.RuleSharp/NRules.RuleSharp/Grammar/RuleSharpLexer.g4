@@ -128,8 +128,11 @@ WHERE:         'where';
 WHILE:         'while';
 YIELD:         'yield';
 
-// Rule Definitions
+// Rule Keywords
+DESCRIPTION:   'description';
+PRIORITY:      'priority';
 RULE:          'rule';
+TAG:           'tag';
 THEN:          'then';
 
 //B.1.6 Identifiers

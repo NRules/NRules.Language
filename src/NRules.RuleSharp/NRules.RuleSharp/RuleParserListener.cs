@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using NRules.RuleModel;
 using NRules.RuleModel.Builders;
@@ -24,15 +26,29 @@ namespace NRules.RuleSharp
 
         public override void EnterRule_name(RuleSharpParser.Rule_nameContext context)
         {
-            var name = context.GetText();
+            var value = context.GetText();
+            var name = value.TrimStart('@').Trim('"');
             _builder.Name(name);
         }
 
         public override void EnterRule_description(RuleSharpParser.Rule_descriptionContext context)
         {
-            var text = context.GetText();
-            var description = text.TrimStart('@').Trim('"');
+            var value = context.value.GetText();
+            var description = value.TrimStart('@').Trim('"');
             _builder.Description(description);
+        }
+
+        public override void EnterRule_priority(RuleSharpParser.Rule_priorityContext context)
+        {
+            var value = context.value.Text;
+            var priotity = Int32.Parse(value);
+            _builder.Priority(priotity);
+        }
+
+        public override void EnterRule_tags(RuleSharpParser.Rule_tagsContext context)
+        {
+            var tags = context._values.Select(x => x.GetText().TrimStart('@').Trim('"'));
+            _builder.Tags(tags);
         }
 
         public override void EnterRule_pattern(RuleSharpParser.Rule_patternContext context)
