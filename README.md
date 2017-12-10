@@ -1,4 +1,4 @@
-# NRules
+# Rule# - Language for NRules
 
 Rule# (Rule Sharp) is a business rules language for NRules rules engine. This project is currently in early development.
 
