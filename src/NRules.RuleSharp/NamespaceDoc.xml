@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<doc>
+  <assembly>
+    <name>_NamespaceComments_</name>
+  </assembly>
+  <members>
+    <member name="N:NRules.RuleSharp">
+      <summary>
+        Contains types that implement external rules language 'RSharp' for the rules engine.
+      </summary>
+    </member>
+  </members>
+</doc>
