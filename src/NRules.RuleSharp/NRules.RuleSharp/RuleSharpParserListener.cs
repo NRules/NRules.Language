@@ -7,10 +7,10 @@ namespace NRules.RuleSharp
 {
     internal class RuleSharpParserListener : RuleSharpParserBaseListener
     {
-        private readonly RuleParserContext _parserContext;
+        private readonly ParserContext _parserContext;
         private readonly RuleSet _ruleSet;
 
-        public RuleSharpParserListener(RuleParserContext parserContext, RuleSet ruleSet)
+        public RuleSharpParserListener(ParserContext parserContext, RuleSet ruleSet)
         {
             _parserContext = parserContext;
             _ruleSet = ruleSet;

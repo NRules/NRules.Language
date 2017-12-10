@@ -9,13 +9,13 @@ namespace NRules.RuleSharp
 {
     internal class RuleParserListener : RuleSharpParserBaseListener
     {
-        private readonly RuleParserContext _parserContext;
+        private readonly ParserContext _parserContext;
         private readonly SymbolTable _symbolTable;
         private readonly RuleBuilder _builder;
         private readonly GroupBuilder _groupBuilder;
         private readonly ActionGroupBuilder _actionGroupBuilder;
 
-        public RuleParserListener(RuleParserContext parserContext, RuleBuilder builder)
+        public RuleParserListener(ParserContext parserContext, RuleBuilder builder)
         {
             _parserContext = parserContext;
             _symbolTable = new SymbolTable(parserContext.SymbolTable);

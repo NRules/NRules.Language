@@ -8,11 +8,11 @@ namespace NRules.RuleSharp
 {
     internal class ExpressionParser : RuleSharpParserBaseVisitor<Expression>
     {
-        private readonly RuleParserContext _parserContext;
+        private readonly ParserContext _parserContext;
         private readonly Stack<Type[]> _contextTypes = new Stack<Type[]>();
         private SymbolTable _symbolTable;
 
-        public ExpressionParser(RuleParserContext parserContext, SymbolTable symbolTable, params Type[] contextTypes)
+        public ExpressionParser(ParserContext parserContext, SymbolTable symbolTable, params Type[] contextTypes)
         {
             _parserContext = parserContext;
             _symbolTable = symbolTable;

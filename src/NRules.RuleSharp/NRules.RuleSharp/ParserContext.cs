@@ -1,11 +1,11 @@
 ﻿namespace NRules.RuleSharp
 {
-    internal class RuleParserContext
+    internal class ParserContext
     {
         private readonly TypeLoader _loader;
         private readonly SymbolTable _symbolTable = new SymbolTable();
 
-        public RuleParserContext(TypeLoader loader)
+        public ParserContext(TypeLoader loader)
         {
             _loader = loader;
         }

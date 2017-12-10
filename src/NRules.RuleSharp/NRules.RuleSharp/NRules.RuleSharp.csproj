@@ -72,8 +72,8 @@
     <Compile Include="PatternExpressionRewriter.cs" />
     <Compile Include="PrimaryExpressionBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RSharpParserListener.cs" />
-    <Compile Include="RuleParserContext.cs" />
+    <Compile Include="RuleSharpParserListener.cs" />
+    <Compile Include="ParserContext.cs" />
     <Compile Include="RuleParserListener.cs" />
     <Compile Include="RuleRepository.cs" />
     <Compile Include="SymbolTable.cs" />

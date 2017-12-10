@@ -12,7 +12,7 @@ namespace NRules.RuleSharp
     /// </summary>
     public class RuleRepository : IRuleRepository
     {
-        private readonly List<Assembly> _assemblies = new List<Assembly>();
+        private readonly List<Assembly> _references = new List<Assembly>();
         private readonly RuleSet _defaultRuleSet = new RuleSet("Default");
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace NRules.RuleSharp
         /// <param name="assemblies">Reference assemblies.</param>
         public void AddReferences(IEnumerable<Assembly> assemblies)
         {
-            _assemblies.AddRange(assemblies);
+            _references.AddRange(assemblies);
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace NRules.RuleSharp
         /// <param name="assembly">Reference assembly.</param>
         public void AddReference(Assembly assembly)
         {
-            _assemblies.Add(assembly);
+            _references.Add(assembly);
         }
 
         /// <summary>
@@ -72,8 +72,8 @@ namespace NRules.RuleSharp
         /// <param name="stream">Stream to load the rules from.</param>
         public void Load(Stream stream)
         {
-            var loader = new TypeLoader(_assemblies);
-            var parserContext = new RuleParserContext(loader);
+            var loader = new TypeLoader(_references);
+            var parserContext = new ParserContext(loader);
             var listener = new RuleSharpParserListener(parserContext, _defaultRuleSet);
 
             var tree = ParseTree(stream);

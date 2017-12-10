@@ -6,10 +6,10 @@ namespace NRules.RuleSharp
 {
     internal class DeclarationParser : RuleSharpParserBaseVisitor<Tuple<ParameterExpression[], Expression[]>>
     {
-        private readonly RuleParserContext _parserContext;
+        private readonly ParserContext _parserContext;
         private readonly SymbolTable _symbolTable;
 
-        public DeclarationParser(RuleParserContext parserContext, SymbolTable symbolTable)
+        public DeclarationParser(ParserContext parserContext, SymbolTable symbolTable)
         {
             _parserContext = parserContext;
             _symbolTable = symbolTable;
