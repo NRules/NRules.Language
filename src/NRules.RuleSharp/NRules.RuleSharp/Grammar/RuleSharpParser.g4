@@ -1165,7 +1165,7 @@ rule_declaration
 	;
   
 rule_name
-	: IDENTIFIER
+	: identifier
 	;
 
 rule_description
@@ -1185,7 +1185,7 @@ rule_right_hand_side
 	;
 
 rule_pattern
-	: VAR IDENTIFIER '=' type OPEN_PARENS expression_list? CLOSE_PARENS ';'
+	: local_variable_type identifier '=' type OPEN_PARENS expression_list? CLOSE_PARENS ';'
 	;
 
 rule_action

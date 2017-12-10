@@ -37,17 +37,22 @@ namespace NRules.RuleSharp
 
         public override void EnterRule_pattern(RuleSharpParser.Rule_patternContext context)
         {
-            var typeName = context.type().GetText();
-            var type = _parserContext.Loader.GetType(typeName);
+            var patternTypeName = context.type().GetText();
+            var patternType = _parserContext.Loader.GetType(patternTypeName);
 
-            var id = context.IDENTIFIER().GetText();
-            _symbolTable.Declare(type, id);
+            var variableTypeName = context.local_variable_type().VAR() == null 
+                ? context.local_variable_type().type().GetText()
+                : patternTypeName;
+            var variableType = _parserContext.Loader.GetType(variableTypeName);
 
-            var patternBuilder = _groupBuilder.Pattern(type, id);
+            var id = context.identifier().GetText();
+            _symbolTable.Declare(variableType, id);
+
+            var patternBuilder = _groupBuilder.Pattern(patternType, id);
             foreach (var expressionContext in context.expression_list().expression())
             {
                 var localTable = new SymbolTable(_symbolTable);
-                var expressionParser = new ExpressionParser(_parserContext, localTable, type);
+                var expressionParser = new ExpressionParser(_parserContext, localTable, patternType);
                 var expression = (LambdaExpression) expressionParser.Visit(expressionContext);
                 patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
             }
