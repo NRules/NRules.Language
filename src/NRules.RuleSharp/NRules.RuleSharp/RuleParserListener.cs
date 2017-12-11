@@ -65,12 +65,15 @@ namespace NRules.RuleSharp
             _symbolTable.Declare(variableType, id);
 
             var patternBuilder = _groupBuilder.Pattern(patternType, id);
-            foreach (var expressionContext in context.expression_list().expression())
+            if (context.expression_list() != null)
             {
-                var localTable = new SymbolTable(_symbolTable);
-                var expressionParser = new ExpressionParser(_parserContext, localTable, patternType);
-                var expression = (LambdaExpression) expressionParser.Visit(expressionContext);
-                patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
+                foreach (var expressionContext in context.expression_list().expression())
+                {
+                    var localTable = new SymbolTable(_symbolTable);
+                    var expressionParser = new ExpressionParser(_parserContext, localTable, patternType);
+                    var expression = (LambdaExpression) expressionParser.Visit(expressionContext);
+                    patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
+                }
             }
         }
 
