@@ -25,5 +25,11 @@ namespace NRules.RuleSharp.IntegrationTests
         {
             Repository.Load(@"Rules\FactConditionTests.rs");
         }
+
+        [Fact]
+        public void Load_MemberAccessTests_Loads()
+        {
+            Repository.Load(@"Rules\MemberAccessTests.rs");
+        }
     }
 }

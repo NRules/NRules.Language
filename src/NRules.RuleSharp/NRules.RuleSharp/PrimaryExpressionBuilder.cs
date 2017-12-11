@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace NRules.RuleSharp
 {
@@ -69,10 +70,26 @@ namespace NRules.RuleSharp
             }
         }
 
-        public void TerminalToken(string token)
+        public void Index(List<Expression> indexList)
         {
             Evaluate();
-            throw new ArgumentException($"Unsupported token. Token={token}");
+            if (_expression == null)
+                throw new ArgumentException("No expression to apply indexer.");
+
+            var expressionType = _expression.Type;
+            if (expressionType.IsArray)
+            {
+                _expression = Expression.ArrayAccess(_expression, indexList);
+            }
+            else
+            {
+                var indexer = expressionType.GetProperties()
+                    .SingleOrDefault(pi => pi.GetIndexParameters().Any());
+                if (indexer == null)
+                    throw new ArgumentException($"Type does not have indexer property. Type={expressionType}");
+
+                _expression = Expression.MakeIndex(_expression, indexer, indexList);
+            }
         }
 
         private void Evaluate()

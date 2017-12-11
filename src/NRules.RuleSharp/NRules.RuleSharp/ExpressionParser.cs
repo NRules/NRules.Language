@@ -130,15 +130,33 @@ namespace NRules.RuleSharp
                     {
                         foreach (var argumentContext in mi.argument_list().argument())
                         {
-                            var argument = VisitArgument(argumentContext);
+                            var argument = Visit(argumentContext);
                             argumentsList.Add(argument);
                         }
                     }
                     builder.Method(argumentsList);
                 }
+                else if (child is RuleSharpParser.Bracket_expressionContext be)
+                {
+                    var indexList = new List<Expression>();
+                    foreach (var indexContext in be.indexer_argument())
+                    {
+                        var index = Visit(indexContext);
+                        indexList.Add(index);
+                    }
+                    builder.Index(indexList);
+                }
                 else if (child is ITerminalNode tn)
                 {
-                    builder.TerminalToken(tn.GetText());
+                    var op = tn.Symbol.Text;
+                    if (op == "++")
+                    {
+                        throw new ArgumentException($"Unsupported operation. Operation={op}");
+                    }
+                    else if (op == "--")
+                    {
+                        throw new ArgumentException($"Unsupported operation. Operation={op}");
+                    }
                 }
             }
 
