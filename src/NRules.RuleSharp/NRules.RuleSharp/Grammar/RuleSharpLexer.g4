@@ -1,4 +1,5 @@
 //Derived from https://github.com/antlr/grammars-v4/csharp
+//License: Eclipse Public License - v 1.0 (http://www.eclipse.org/legal/epl-v10.html)
 
 lexer grammar RuleSharpLexer;
 
