@@ -67,6 +67,7 @@
     <Compile Include="BuilderExtensions.cs" />
     <Compile Include="CompilationException.cs" />
     <Compile Include="DeclarationParser.cs" />
+    <Compile Include="DeclarationResult.cs" />
     <Compile Include="ExpressionParser.cs" />
     <Compile Include="ExpressionRewriter.cs" />
     <Compile Include="LiteralParser.cs" />

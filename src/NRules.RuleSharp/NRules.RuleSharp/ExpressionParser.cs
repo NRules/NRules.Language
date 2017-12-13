@@ -56,8 +56,8 @@ namespace NRules.RuleSharp
                 {
                     var declarationParser = new DeclarationParser(_parserContext, _symbolTable);
                     var declarationResult = declarationParser.Visit(statementContext);
-                    declarations.AddRange(declarationResult.Item1);
-                    statements.AddRange(declarationResult.Item2);
+                    declarations.AddRange(declarationResult.Declarations);
+                    statements.AddRange(declarationResult.Initializers);
                 }
                 else
                 {

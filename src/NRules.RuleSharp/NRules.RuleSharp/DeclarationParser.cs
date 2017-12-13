@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 using static NRules.RuleSharp.RuleSharpParser;
 
 namespace NRules.RuleSharp
 {
-    internal class DeclarationParser : RuleSharpParserBaseVisitor<Tuple<ParameterExpression[], Expression[]>>
+    internal class DeclarationParser : RuleSharpParserBaseVisitor<DeclarationResult>
     {
         private readonly ParserContext _parserContext;
         private readonly SymbolTable _symbolTable;
@@ -16,7 +15,7 @@ namespace NRules.RuleSharp
             _symbolTable = symbolTable;
         }
 
-        public override Tuple<ParameterExpression[], Expression[]> VisitDeclarationStatement(DeclarationStatementContext context)
+        public override DeclarationResult VisitDeclarationStatement(DeclarationStatementContext context)
         {
             var declarations = new List<ParameterExpression>();
             var statements = new List<Expression>();
@@ -38,7 +37,7 @@ namespace NRules.RuleSharp
                 }
             }
 
-            return Tuple.Create(declarations.ToArray(), statements.ToArray());
+            return new DeclarationResult(declarations, statements);
         }
     }
 }
