@@ -83,12 +83,19 @@ namespace NRules.RuleSharp
 
         private static IParseTree ParseTree(Stream inputStream)
         {
-            var input = new AntlrInputStream(inputStream);
-            var lexer = new RuleSharpLexer(input);
-            var tokens = new CommonTokenStream(lexer);
-            var parser = new RuleSharpParser(tokens);
-            IParseTree tree = parser.compilation_unit();
-            return tree;
+            try
+            {
+                var input = new AntlrInputStream(inputStream);
+                var lexer = new RuleSharpLexer(input);
+                var tokens = new CommonTokenStream(lexer);
+                var parser = new RuleSharpParser(tokens);
+                IParseTree tree = parser.compilation_unit();
+                return tree;
+            }
+            catch (RecognitionException e)
+            {
+                throw new CompilationException("Failed to compile rules", e.Context, e);
+            }
         }
     }
 }

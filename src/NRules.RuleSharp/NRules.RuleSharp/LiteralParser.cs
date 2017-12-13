@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq.Expressions;
+using static NRules.RuleSharp.RuleSharpParser;
 
 namespace NRules.RuleSharp
 {
     internal class LiteralParser : RuleSharpParserBaseVisitor<Expression>
     {
-        public override Expression VisitLiteral(RuleSharpParser.LiteralContext context)
+        public override Expression VisitLiteral(LiteralContext context)
         {
             if (context.string_literal() != null)
             {
@@ -45,7 +46,7 @@ namespace NRules.RuleSharp
                 var value = Double.Parse(literal.Symbol.Text);
                 return Expression.Constant(value, typeof(double));
             }
-            throw new NotSupportedException($"Unsupported literal. Value={context.GetText()}");
+            throw new CompilationException("Unsupported literal", context);
         }
     }
 }

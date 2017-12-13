@@ -2,6 +2,7 @@
 using Antlr4.Runtime.Tree;
 using NRules.RuleModel;
 using NRules.RuleModel.Builders;
+using static NRules.RuleSharp.RuleSharpParser;
 
 namespace NRules.RuleSharp
 {
@@ -16,20 +17,20 @@ namespace NRules.RuleSharp
             _ruleSet = ruleSet;
         }
 
-        public override void EnterUsingNamespaceDirective(RuleSharpParser.UsingNamespaceDirectiveContext context)
+        public override void EnterUsingNamespaceDirective(UsingNamespaceDirectiveContext context)
         {
             var @namespace = context.namespace_or_type_name().GetText();
             _parserContext.Loader.AddNamespace(@namespace);
         }
 
-        public override void EnterUsingAliasDirective(RuleSharpParser.UsingAliasDirectiveContext context)
+        public override void EnterUsingAliasDirective(UsingAliasDirectiveContext context)
         {
             var alias = context.identifier().GetText();
             var typeName = context.namespace_or_type_name().GetText();
             _parserContext.Loader.AddAlias(alias, typeName);
         }
 
-        public override void EnterRule_definition(RuleSharpParser.Rule_definitionContext context)
+        public override void EnterRule_definition(Rule_definitionContext context)
         {
             var builder = new RuleBuilder();
 

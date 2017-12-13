@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
+using Antlr4.Runtime.Tree;
 
 namespace NRules.RuleSharp
 {
@@ -11,9 +11,10 @@ namespace NRules.RuleSharp
     {
         private readonly TypeLoader _loader;
 
+        private IParseTree _context;
         private Expression _expression;
         private Type _type;
-        private string _token;
+        private string _name;
 
         public PrimaryExpressionBuilder(TypeLoader loader)
         {
@@ -26,47 +27,68 @@ namespace NRules.RuleSharp
             return _expression;
         }
 
-        public void Start(Expression pe, string token)
+        public void Context(IParseTree context)
         {
-            if (pe != null)
-                Expr(pe);
+            _context = context;
+        }
+
+        public void ExpressionStart(Expression expression)
+        {
+            SetExpression(expression);
+        }
+
+        public void NamePart(string namePart)
+        {
+            if (_name == null)
+            {
+                _name = namePart.Trim('.');
+            }
             else
-                Token(token);
+            {
+                _name += namePart;
+            }
+
+            if (_type == null)
+            {
+                _type = _loader.FindType(_name);
+                if (_type != null)
+                    _name = null;
+            }
         }
 
         public void Member(string token)
         {
             Evaluate();
-            Token(token);
+            NamePart(token);
         }
 
         public void Method(List<Expression> argumentsList)
         {
             var argumentTypes = argumentsList.Select(x => x.Type).ToArray();
 
-            if (_expression != null && _token != null)
+            if (_expression != null && _name != null)
             {
-                var mi = _expression.Type.GetMethod(_token, argumentTypes);
+                var mi = _expression.Type.GetMethod(_name, argumentTypes);
                 if (mi == null)
                 {
-                    throw new ArgumentException($"Unrecognized method. Type={_expression.Type}, Method={_token}");
+                    throw new CompilationException($"Unrecognized method. Type={_expression.Type}, Method={_name}", _context);
                 }
                 var arguments = EnsureArgumentTypes(argumentsList, mi);
-                Expr(Expression.Call(_expression, mi, arguments));
+                SetExpression(Expression.Call(_expression, mi, arguments));
             }
-            else if (_type != null && _token != null)
+            else if (_type != null && _name != null)
             {
-                var mi = _type.GetMethod(_token, argumentTypes);
+                var mi = _type.GetMethod(_name, argumentTypes);
                 if (mi == null)
                 {
-                    throw new ArgumentException($"Unrecognized method. Type={_type}, Method={_token}");
+                    throw new CompilationException($"Unrecognized method. Type={_type}, Method={_name}", _context);
                 }
                 var arguments = EnsureArgumentTypes(argumentsList, mi);
-                Expr(Expression.Call(null, mi, arguments));
+                SetExpression(Expression.Call(null, mi, arguments));
             }
             else
             {
-                throw new ArgumentException("Unexpected method call");
+                throw new CompilationException("Unexpected method call", _context);
             }
         }
 
@@ -74,7 +96,7 @@ namespace NRules.RuleSharp
         {
             Evaluate();
             if (_expression == null)
-                throw new ArgumentException("No expression to apply indexer.");
+                throw new CompilationException("No expression to apply indexer", _context);
 
             var expressionType = _expression.Type;
             if (expressionType.IsArray)
@@ -86,7 +108,7 @@ namespace NRules.RuleSharp
                 var indexer = expressionType.GetProperties()
                     .SingleOrDefault(pi => pi.GetIndexParameters().Any());
                 if (indexer == null)
-                    throw new ArgumentException($"Type does not have indexer property. Type={expressionType}");
+                    throw new CompilationException($"Type does not have indexer property. Type={expressionType}", _context);
 
                 _expression = Expression.MakeIndex(_expression, indexer, indexList);
             }
@@ -94,49 +116,30 @@ namespace NRules.RuleSharp
 
         private void Evaluate()
         {
-            if (_token == null) return;
+            if (_name == null) return;
 
             if (_expression != null)
             {
-                Expr(Expression.PropertyOrField(_expression, _token));
+                SetExpression(Expression.PropertyOrField(_expression, _name));
             }
             else if (_type != null)
             {
-                var field = _type.GetField(_token);
-                var property = _type.GetProperty(_token);
+                var field = _type.GetField(_name);
+                var property = _type.GetProperty(_name);
                 if (field != null)
-                    Expr(Expression.Field(null, field));
+                    SetExpression(Expression.Field(null, field));
                 else if (property != null)
-                    Expr(Expression.Property(null, property));
+                    SetExpression(Expression.Property(null, property));
                 else
-                    throw new ArgumentException($"Unrecognized type member. Type={_type}, Member={_token}");
+                    throw new CompilationException($"Unrecognized type member. Type={_type}, Member={_name}", _context);
             }
         }
 
-        private void Token(string token)
-        {
-            if (_token == null)
-            {
-                _token = token.Trim('.');
-            }
-            else
-            {
-                _token += token;
-            }
-
-            if (_type == null)
-            {
-                _type = _loader.FindType(_token);
-                if (_type != null)
-                    _token = null;
-            }
-        }
-
-        private void Expr(Expression pe)
+        private void SetExpression(Expression pe)
         {
             _expression = pe;
             _type = null;
-            _token = null;
+            _name = null;
         }
 
         private static IEnumerable<Expression> EnsureArgumentTypes(List<Expression> argumentsList, MethodInfo mi)

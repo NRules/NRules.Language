@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using static NRules.RuleSharp.RuleSharpParser;
 
 namespace NRules.RuleSharp
 {
@@ -15,7 +16,7 @@ namespace NRules.RuleSharp
             _symbolTable = symbolTable;
         }
 
-        public override Tuple<ParameterExpression[], Expression[]> VisitDeclarationStatement(RuleSharpParser.DeclarationStatementContext context)
+        public override Tuple<ParameterExpression[], Expression[]> VisitDeclarationStatement(DeclarationStatementContext context)
         {
             var declarations = new List<ParameterExpression>();
             var statements = new List<Expression>();

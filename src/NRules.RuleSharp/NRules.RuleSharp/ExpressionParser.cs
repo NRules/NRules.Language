@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Antlr4.Runtime.Tree;
+using static NRules.RuleSharp.RuleSharpParser;
 
 namespace NRules.RuleSharp
 {
@@ -19,19 +20,19 @@ namespace NRules.RuleSharp
             _contextTypes.Push(contextTypes);
         }
 
-        public override Expression VisitEmbeddedStatement(RuleSharpParser.EmbeddedStatementContext context)
+        public override Expression VisitEmbeddedStatement(EmbeddedStatementContext context)
         {
             var expression = base.VisitEmbeddedStatement(context);
             return expression;
         }
 
-        public override Expression VisitExpressionStatement(RuleSharpParser.ExpressionStatementContext context)
+        public override Expression VisitExpressionStatement(ExpressionStatementContext context)
         {
             var expression = VisitExpression(context.expression());
             return expression;
         }
 
-        public override Expression VisitBlock(RuleSharpParser.BlockContext context)
+        public override Expression VisitBlock(BlockContext context)
         {
             var parentTable = _symbolTable;
             _symbolTable = new SymbolTable(parentTable);
@@ -45,13 +46,13 @@ namespace NRules.RuleSharp
             }
         }
 
-        public override Expression VisitStatement_list(RuleSharpParser.Statement_listContext context)
+        public override Expression VisitStatement_list(Statement_listContext context)
         {
             var declarations = new List<ParameterExpression>();
             var statements = new List<Expression>();
             foreach (var statementContext in context.statement())
             {
-                if (statementContext is RuleSharpParser.DeclarationStatementContext)
+                if (statementContext is DeclarationStatementContext)
                 {
                     var declarationParser = new DeclarationParser(_parserContext, _symbolTable);
                     var declarationResult = declarationParser.Visit(statementContext);
@@ -69,7 +70,7 @@ namespace NRules.RuleSharp
             return block;
         }
 
-        public override Expression VisitLambda_expression(RuleSharpParser.Lambda_expressionContext context)
+        public override Expression VisitLambda_expression(Lambda_expressionContext context)
         {
             var contextTypes = _contextTypes.Peek();
             var parameters = new List<ParameterExpression>();
@@ -111,19 +112,96 @@ namespace NRules.RuleSharp
             return Expression.Lambda(body, parameters);
         }
 
-        public override Expression VisitPrimary_expression(RuleSharpParser.Primary_expressionContext context)
+        public override Expression VisitPrimary_expression(Primary_expressionContext context)
         {
             var builder = new PrimaryExpressionBuilder(_parserContext.Loader);
-            var pe = VisitPrimary_expression_start(context.pe);
-            builder.Start(pe, context.pe.GetText());
+            var pe = context.pe;
+            builder.Context(pe);
+            if (pe is LiteralExpressionContext l)
+            {
+                var literalParser = new LiteralParser();
+                var literal = literalParser.Visit(l);
+                builder.ExpressionStart(literal);
+            }
+            else if (pe is LiteralAccessExpressionContext)
+            {
+                throw new CompilationException("Unsupported expression. ExpressionType=literal access", context);
+            }
+            else if (pe is SimpleNameExpressionContext sn)
+            {
+                var identifier = VisitIdentifier(sn.identifier());
+                if (identifier != null)
+                {
+                    builder.ExpressionStart(identifier);
+                }
+                else
+                {
+                    //TODO: handle generics
+                    builder.NamePart(sn.GetText());
+                }
+            }
+            else if (pe is ParenthesisExpressionContext pre)
+            {
+                var innerExpression = Visit(pre.expression());
+                builder.ExpressionStart(innerExpression);
+            }
+            else if (pe is ObjectCreationExpressionContext)
+            {
+                throw new CompilationException("Unsupported expression. ExpressionType=object creation", context);
+            }
+            else if (pe is MemberAccessExpressionContext pt)
+            {
+                builder.NamePart(pt.GetText());
+            }
+            else if (pe is ThisReferenceExpressionContext)
+            {
+                throw new CompilationException("Unsupported expression. ExpressionType=this reference", context);
+            }
+            else if (pe is BaseAccessExpressionContext)
+            {
+                throw new CompilationException("Unsupported expression. ExpressionType=base access", context);
+            }
+            else if (pe is TypeofExpressionContext)
+            {
+                throw new CompilationException("Unsupported expression. ExpressionType=typeof", context);
+            }
+            else if (pe is SizeofExpressionContext)
+            {
+                throw new CompilationException("Unsupported expression. ExpressionType=sizeof", context);
+            }
+            else if (pe is NameofExpressionContext)
+            {
+                throw new CompilationException("Unsupported expression. ExpressionType=nameof", context);
+            }
+            else if (pe is CheckedExpressionContext)
+            {
+                throw new CompilationException("Unsupported expression. ExpressionType=checked", context);
+            }
+            else if (pe is UncheckedExpressionContext)
+            {
+                throw new CompilationException("Unsupported expression. ExpressionType=unchecked", context);
+            }
+            else if (pe is DefaultValueExpressionContext)
+            {
+                throw new CompilationException("Unsupported expression. ExpressionType=default", context);
+            }
+            else if (pe is AnonymousMethodExpressionContext)
+            {
+                throw new CompilationException("Unsupported expression. ExpressionType=anonymous method", context);
+            }
+            else
+            {
+                throw new CompilationException("Unsupported expression", context);
+            }
 
             foreach (var child in context.children.Skip(1))
             {
-                if (child is RuleSharpParser.Member_accessContext)
+                builder.Context(child);
+                if (child is Member_accessContext)
                 {
                     builder.Member(child.GetText());
                 }
-                else if (child is RuleSharpParser.Method_invocationContext mi)
+                else if (child is Method_invocationContext mi)
                 {
                     var argumentsList = new List<Expression>();
                     if (mi.argument_list() != null)
@@ -136,7 +214,7 @@ namespace NRules.RuleSharp
                     }
                     builder.Method(argumentsList);
                 }
-                else if (child is RuleSharpParser.Bracket_expressionContext be)
+                else if (child is Bracket_expressionContext be)
                 {
                     var indexList = new List<Expression>();
                     foreach (var indexContext in be.indexer_argument())
@@ -148,15 +226,12 @@ namespace NRules.RuleSharp
                 }
                 else if (child is ITerminalNode tn)
                 {
-                    var op = tn.Symbol.Text;
-                    if (op == "++")
-                    {
-                        throw new ArgumentException($"Unsupported operation. Operation={op}");
-                    }
-                    else if (op == "--")
-                    {
-                        throw new ArgumentException($"Unsupported operation. Operation={op}");
-                    }
+                    var op = tn.Symbol.Text; //++, --
+                    throw new CompilationException($"Unsupported operation. Operation={op}", context);
+                }
+                else
+                {
+                    throw new CompilationException("Unsupported expression", context);
                 }
             }
 
@@ -164,7 +239,7 @@ namespace NRules.RuleSharp
             return expression;
         }
 
-        public override Expression VisitIfStatement(RuleSharpParser.IfStatementContext context)
+        public override Expression VisitIfStatement(IfStatementContext context)
         {
             var test = Visit(context.expression());
             var ifBlock = Visit(context.if_body()[0]);
@@ -176,22 +251,27 @@ namespace NRules.RuleSharp
             return Expression.IfThen(test, ifBlock);
         }
 
-        public override Expression VisitWhileStatement(RuleSharpParser.WhileStatementContext context)
+        public override Expression VisitWhileStatement(WhileStatementContext context)
         {
-            throw new NotSupportedException("While loop not supported");
+            throw new CompilationException("Unsupported statement. StatementType=while loop", context);
         }
 
-        public override Expression VisitDoStatement(RuleSharpParser.DoStatementContext context)
+        public override Expression VisitDoStatement(DoStatementContext context)
         {
-            throw new NotSupportedException("Do loop not supported");
+            throw new CompilationException("Unsupported statement. StatementType=do loop", context);
         }
 
-        public override Expression VisitForStatement(RuleSharpParser.ForStatementContext context)
+        public override Expression VisitForStatement(ForStatementContext context)
         {
-            throw new NotSupportedException("For loop not supported");
+            throw new CompilationException("Unsupported statement. StatementType=for loop", context);
         }
 
-        public override Expression VisitConditional_expression(RuleSharpParser.Conditional_expressionContext context)
+        public override Expression VisitForeachStatement(ForeachStatementContext context)
+        {
+            throw new CompilationException("Unsupported statement. StatementType=foreach loop", context);
+        }
+
+        public override Expression VisitConditional_expression(Conditional_expressionContext context)
         {
             var expression = Visit(context.children[0]);
             if (context.expression().Any())
@@ -203,7 +283,7 @@ namespace NRules.RuleSharp
             return expression;
         }
 
-        public override Expression VisitNull_coalescing_expression(RuleSharpParser.Null_coalescing_expressionContext context)
+        public override Expression VisitNull_coalescing_expression(Null_coalescing_expressionContext context)
         {
             var expression = Visit(context.children[0]);
             if (context.null_coalescing_expression() != null)
@@ -214,7 +294,7 @@ namespace NRules.RuleSharp
             return expression;
         }
 
-        public override Expression VisitRelational_expression(RuleSharpParser.Relational_expressionContext context)
+        public override Expression VisitRelational_expression(Relational_expressionContext context)
         {
             var expression = Visit(context.children[0]);
             for (int i = 1; i < context.children.Count - 1; i += 2)
@@ -239,13 +319,13 @@ namespace NRules.RuleSharp
                 }
                 else
                 {
-                    throw new ArgumentException($"Unsupported operation. Operation={op}");
+                    throw new CompilationException($"Unsupported operation. Operation={op}", context);
                 }
             }
             return expression;
         }
 
-        public override Expression VisitConditional_or_expression(RuleSharpParser.Conditional_or_expressionContext context)
+        public override Expression VisitConditional_or_expression(Conditional_or_expressionContext context)
         {
             var expression = Visit(context.children[0]);
             for (int i = 1; i < context.children.Count - 1; i += 2)
@@ -256,7 +336,7 @@ namespace NRules.RuleSharp
             return expression;
         }
 
-        public override Expression VisitConditional_and_expression(RuleSharpParser.Conditional_and_expressionContext context)
+        public override Expression VisitConditional_and_expression(Conditional_and_expressionContext context)
         {
             var expression = Visit(context.children[0]);
             for (int i = 1; i < context.children.Count - 1; i += 2)
@@ -267,7 +347,7 @@ namespace NRules.RuleSharp
             return expression;
         }
 
-        public override Expression VisitInclusive_or_expression(RuleSharpParser.Inclusive_or_expressionContext context)
+        public override Expression VisitInclusive_or_expression(Inclusive_or_expressionContext context)
         {
             var expression = Visit(context.children[0]);
             for (int i = 1; i < context.children.Count - 1; i += 2)
@@ -278,7 +358,7 @@ namespace NRules.RuleSharp
             return expression;
         }
 
-        public override Expression VisitExclusive_or_expression(RuleSharpParser.Exclusive_or_expressionContext context)
+        public override Expression VisitExclusive_or_expression(Exclusive_or_expressionContext context)
         {
             var expression = Visit(context.children[0]);
             for (int i = 1; i < context.children.Count - 1; i += 2)
@@ -289,7 +369,7 @@ namespace NRules.RuleSharp
             return expression;
         }
 
-        public override Expression VisitAnd_expression(RuleSharpParser.And_expressionContext context)
+        public override Expression VisitAnd_expression(And_expressionContext context)
         {
             var expression = Visit(context.children[0]);
             for (int i = 1; i < context.children.Count - 1; i += 2)
@@ -300,7 +380,7 @@ namespace NRules.RuleSharp
             return expression;
         }
 
-        public override Expression VisitEquality_expression(RuleSharpParser.Equality_expressionContext context)
+        public override Expression VisitEquality_expression(Equality_expressionContext context)
         {
             var expression = Visit(context.children[0]);
             for (int i = 1; i < context.children.Count - 1; i += 2)
@@ -317,13 +397,13 @@ namespace NRules.RuleSharp
                 }
                 else
                 {
-                    throw new ArgumentException($"Unsupported operation. Operation={op}");
+                    throw new CompilationException($"Unsupported operation. Operation={op}", context);
                 }
             }
             return expression;
         }
 
-        public override Expression VisitMultiplicative_expression(RuleSharpParser.Multiplicative_expressionContext context)
+        public override Expression VisitMultiplicative_expression(Multiplicative_expressionContext context)
         {
             var expression = Visit(context.children[0]);
             for (int i = 1; i < context.children.Count - 1; i += 2)
@@ -344,13 +424,13 @@ namespace NRules.RuleSharp
                 }
                 else
                 {
-                    throw new ArgumentException($"Unsupported operation. Operation={op}");
+                    throw new CompilationException($"Unsupported operation. Operation={op}", context);
                 }
             }
             return expression;
         }
 
-        public override Expression VisitAdditive_expression(RuleSharpParser.Additive_expressionContext context)
+        public override Expression VisitAdditive_expression(Additive_expressionContext context)
         {
             var expression = Visit(context.children[0]);
             for (int i = 1; i < context.children.Count - 1; i += 2)
@@ -372,13 +452,13 @@ namespace NRules.RuleSharp
                 }
                 else
                 {
-                    throw new ArgumentException($"Unsupported operation. Operation={op}");
+                    throw new CompilationException($"Unsupported operation. Operation={op}", context);
                 }
             }
             return expression;
         }
 
-        public override Expression VisitAssignment(RuleSharpParser.AssignmentContext context)
+        public override Expression VisitAssignment(AssignmentContext context)
         {
             var unaryExpression = Visit(context.unary_expression());
             var expression = Visit(context.expression());
@@ -429,17 +509,17 @@ namespace NRules.RuleSharp
                 return Expression.RightShiftAssign(unaryExpression, expression);
             }
 
-            throw new ArgumentException($"Unsupported operation. Operation={op}");
+            throw new CompilationException($"Unsupported operation. Operation={op}", context);
         }
 
-        public override Expression VisitLiteral(RuleSharpParser.LiteralContext context)
+        public override Expression VisitLiteral(LiteralContext context)
         {
             var literalParser = new LiteralParser();
             var literal = literalParser.Visit(context);
             return literal;
         }
         
-        public override Expression VisitIdentifier(RuleSharpParser.IdentifierContext context)
+        public override Expression VisitIdentifier(IdentifierContext context)
         {
             var identifierName = context.GetText();
             var identifier = _symbolTable.Lookup(identifierName);
