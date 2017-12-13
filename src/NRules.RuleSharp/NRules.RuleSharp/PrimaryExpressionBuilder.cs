@@ -145,9 +145,9 @@ namespace NRules.RuleSharp
             }
         }
 
-        private void SetExpression(Expression pe)
+        private void SetExpression(Expression expression)
         {
-            _expression = pe;
+            _expression = expression;
             _type = null;
             _name = null;
         }
