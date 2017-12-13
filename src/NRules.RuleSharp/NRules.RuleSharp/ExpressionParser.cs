@@ -199,7 +199,8 @@ namespace NRules.RuleSharp
                 builder.Context(child);
                 if (child is Member_accessContext)
                 {
-                    builder.Member(child.GetText());
+                    var memberName = child.GetText().TrimStart('.');
+                    builder.Member(memberName);
                 }
                 else if (child is Method_invocationContext mi)
                 {

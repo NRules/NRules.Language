@@ -23,7 +23,6 @@ namespace NRules.RuleSharp
 
         public Expression GetExpression()
         {
-            Evaluate();
             return _expression;
         }
 
@@ -41,14 +40,14 @@ namespace NRules.RuleSharp
         {
             if (_name == null)
             {
-                _name = namePart.Trim('.');
+                _name = namePart;
             }
             else
             {
-                _name += namePart;
+                _name += $".{namePart}";
             }
 
-            if (_type == null)
+            if (_type == null && _expression == null)
             {
                 _type = _loader.FindType(_name);
                 if (_type != null)
@@ -56,10 +55,45 @@ namespace NRules.RuleSharp
             }
         }
 
-        public void Member(string token)
+        public void Member(string name)
         {
-            Evaluate();
-            NamePart(token);
+            if (_expression != null)
+            {
+                Member(name, _expression.Type, _expression);
+            }
+            else if (_type != null)
+            {
+                Member(name, _type, null);
+            }
+            else
+            {
+                NamePart(name);
+            }
+        }
+
+        private void Member(string name, Type type, Expression instance)
+        {
+            var property = type.GetProperty(name);
+            if (property != null)
+            {
+                SetExpression(Expression.Property(instance, property));
+                return;
+            }
+
+            var field = type.GetField(name);
+            if (field != null)
+            {
+                SetExpression(Expression.Field(instance, field));
+                return;
+            }
+
+            if (type.GetMethods().Any(x => string.Equals(x.Name, name)))
+            {
+                NamePart(name);
+                return;
+            }
+
+            throw new CompilationException($"Unrecognized type member. Type={type}, Member={name}", _context);
         }
 
         public void Method(List<Expression> argumentsList)
@@ -94,7 +128,6 @@ namespace NRules.RuleSharp
 
         public void Index(List<Expression> indexList)
         {
-            Evaluate();
             if (_expression == null)
                 throw new CompilationException("No expression to apply indexer", _context);
 
@@ -111,27 +144,6 @@ namespace NRules.RuleSharp
                     throw new CompilationException($"Type does not have indexer property. Type={expressionType}", _context);
 
                 _expression = Expression.MakeIndex(_expression, indexer, indexList);
-            }
-        }
-
-        private void Evaluate()
-        {
-            if (_name == null) return;
-
-            if (_expression != null)
-            {
-                SetExpression(Expression.PropertyOrField(_expression, _name));
-            }
-            else if (_type != null)
-            {
-                var field = _type.GetField(_name);
-                var property = _type.GetProperty(_name);
-                if (field != null)
-                    SetExpression(Expression.Field(null, field));
-                else if (property != null)
-                    SetExpression(Expression.Property(null, property));
-                else
-                    throw new CompilationException($"Unrecognized type member. Type={_type}, Member={_name}", _context);
             }
         }
 

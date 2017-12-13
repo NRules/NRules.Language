@@ -7,7 +7,7 @@ rule "Array Indexer Rule"
     
     then
         var itemLength = fact.ArrayProperty[0].Length;
-        RuleActions.NoOp();
+        NRules.RuleSharp.IntegrationTests.TestAssets.RuleActions.NoOp();
 
 rule "List Indexer Rule"
     when
