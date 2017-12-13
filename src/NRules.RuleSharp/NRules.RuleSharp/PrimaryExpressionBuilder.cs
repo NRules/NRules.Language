@@ -93,37 +93,35 @@ namespace NRules.RuleSharp
                 return;
             }
 
-            throw new CompilationException($"Unrecognized type member. Type={type}, Member={name}", _context);
+            throw new CompilationException($"Type member not found. Type={type}, Member={name}", _context);
         }
 
         public void Method(List<Expression> argumentsList)
         {
-            var argumentTypes = argumentsList.Select(x => x.Type).ToArray();
-
-            if (_expression != null && _name != null)
+            if (_expression != null)
             {
-                var mi = _expression.Type.GetMethod(_name, argumentTypes);
-                if (mi == null)
-                {
-                    throw new CompilationException($"Unrecognized method. Type={_expression.Type}, Method={_name}", _context);
-                }
-                var arguments = EnsureArgumentTypes(argumentsList, mi);
-                SetExpression(Expression.Call(_expression, mi, arguments));
+                Method(_name ?? "Invoke", _expression.Type, _expression, argumentsList);
             }
             else if (_type != null && _name != null)
             {
-                var mi = _type.GetMethod(_name, argumentTypes);
-                if (mi == null)
-                {
-                    throw new CompilationException($"Unrecognized method. Type={_type}, Method={_name}", _context);
-                }
-                var arguments = EnsureArgumentTypes(argumentsList, mi);
-                SetExpression(Expression.Call(null, mi, arguments));
+                Method(_name, _type, null, argumentsList);
             }
             else
             {
                 throw new CompilationException("Unexpected method call", _context);
             }
+        }
+
+        private void Method(string methodName, Type type, Expression instance, List<Expression> argumentsList)
+        {
+            var argumentTypes = argumentsList.Select(x => x.Type).ToArray();
+            var mi = type.GetMethod(methodName, argumentTypes);
+            if (mi == null)
+            {
+                throw new CompilationException($"Method not found. Type={type}, Method={methodName}", _context);
+            }
+            var arguments = EnsureArgumentTypes(argumentsList, mi);
+            SetExpression(Expression.Call(instance, mi, arguments));
         }
 
         public void Index(List<Expression> indexList)

@@ -24,3 +24,10 @@ rule "String Indexer Rule"
     then
         var charValue = fact.StringProperty[0];
         RuleActions.NoOp();
+
+rule "Action Result Rule"
+    when
+        var fact = TestFact1();
+    
+    then
+        RuleActions.GetAction()("Test");
