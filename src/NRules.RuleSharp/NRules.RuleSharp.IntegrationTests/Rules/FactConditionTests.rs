@@ -16,3 +16,21 @@ rule "Fact Condition Rule 2"
     then
         RuleActions.NoOp();
 }
+
+rule "Exists Condition Rule"
+{
+    when
+        exists TestFact1(x => x.IntProperty > 0);
+    
+    then
+        RuleActions.NoOp();
+}
+
+rule "Not Condition Rule"
+{
+    when
+        not TestFact1(x => x.IntProperty <= 0);
+    
+    then
+        RuleActions.NoOp();
+}

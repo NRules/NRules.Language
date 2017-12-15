@@ -131,6 +131,8 @@ YIELD:         'yield';
 
 // Rule Keywords
 DESCRIPTION:   'description';
+EXISTS:        'exists';
+NOT:           'not';
 PRIORITY:      'priority';
 RULE:          'rule';
 TAG:           'tag';

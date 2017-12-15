@@ -52,12 +52,12 @@ namespace NRules.RuleSharp
             _builder.Tags(tags);
         }
 
-        public override void EnterRule_pattern(Rule_patternContext context)
+        public override void EnterRuleFactMatch(RuleFactMatchContext context)
         {
             var patternTypeName = context.type().GetText();
             var patternType = _parserContext.Loader.GetType(patternTypeName);
 
-            var variableTypeName = context.local_variable_type().VAR() == null 
+            var variableTypeName = context.local_variable_type().VAR() == null
                 ? context.local_variable_type().type().GetText()
                 : patternTypeName;
             var variableType = _parserContext.Loader.GetType(variableTypeName);
@@ -72,7 +72,45 @@ namespace NRules.RuleSharp
                 {
                     var localTable = new SymbolTable(_symbolTable);
                     var expressionParser = new ExpressionParser(_parserContext, localTable, patternType);
-                    var expression = (LambdaExpression) expressionParser.Visit(expressionContext);
+                    var expression = (LambdaExpression)expressionParser.Visit(expressionContext);
+                    patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
+                }
+            }
+        }
+
+        public override void EnterRuleExistsMatch(RuleExistsMatchContext context)
+        {
+            var patternTypeName = context.type().GetText();
+            var patternType = _parserContext.Loader.GetType(patternTypeName);
+
+            var existsBuilder = _groupBuilder.Exists();
+            var patternBuilder = existsBuilder.Pattern(patternType);
+            if (context.expression_list() != null)
+            {
+                foreach (var expressionContext in context.expression_list().expression())
+                {
+                    var localTable = new SymbolTable(_symbolTable);
+                    var expressionParser = new ExpressionParser(_parserContext, localTable, patternType);
+                    var expression = (LambdaExpression)expressionParser.Visit(expressionContext);
+                    patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
+                }
+            }
+        }
+
+        public override void EnterRuleNotMatch(RuleNotMatchContext context)
+        {
+            var patternTypeName = context.type().GetText();
+            var patternType = _parserContext.Loader.GetType(patternTypeName);
+
+            var existsBuilder = _groupBuilder.Not();
+            var patternBuilder = existsBuilder.Pattern(patternType);
+            if (context.expression_list() != null)
+            {
+                foreach (var expressionContext in context.expression_list().expression())
+                {
+                    var localTable = new SymbolTable(_symbolTable);
+                    var expressionParser = new ExpressionParser(_parserContext, localTable, patternType);
+                    var expression = (LambdaExpression)expressionParser.Visit(expressionContext);
                     patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
                 }
             }

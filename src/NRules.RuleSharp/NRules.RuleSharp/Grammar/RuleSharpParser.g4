@@ -1203,7 +1203,9 @@ rule_right_hand_side
     ;
 
 rule_pattern
-    : local_variable_type identifier '=' type OPEN_PARENS expression_list? CLOSE_PARENS ';'
+    : local_variable_type identifier '=' type OPEN_PARENS expression_list? CLOSE_PARENS ';' #ruleFactMatch
+    | EXISTS type OPEN_PARENS expression_list? CLOSE_PARENS ';' #ruleExistsMatch
+    | NOT type OPEN_PARENS expression_list? CLOSE_PARENS ';' #ruleNotMatch
     ;
 
 rule_action
