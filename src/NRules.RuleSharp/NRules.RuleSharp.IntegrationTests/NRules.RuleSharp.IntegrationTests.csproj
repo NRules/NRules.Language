@@ -60,9 +60,6 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <None Include="Rules\FactConditionTests.rs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <Compile Include="TestAssets\BaseRuleTestFixture.cs" />
     <Compile Include="TestAssets\RuleActions.cs" />
     <Compile Include="TestAssets\TestFact1.cs" />
@@ -77,16 +74,6 @@
       <Project>{a64464a8-4372-4862-a256-8a6508fd118a}</Project>
       <Name>NRules.RuleSharp</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Rules\RuleMetadataTests.rs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Rules\MemberAccessTests.rs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

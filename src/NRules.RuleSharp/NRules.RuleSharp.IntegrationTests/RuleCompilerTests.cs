@@ -7,9 +7,32 @@ namespace NRules.RuleSharp.IntegrationTests
     public class RuleCompilerTests : BaseRuleTestFixture
     {
         [Fact]
-        public void Load_RulesWithMetadata_Loads()
+        public void Metadata_TwoRulesWithMetadata_Loads()
         {
-            Repository.Load(@"Rules\RuleMetadataTests.rs");
+            var text = @"
+using System;
+using NRules.RuleSharp.IntegrationTests.TestAssets;
+
+rule ""Metadata Rule 1""
+    description ""Rule with description and priority""
+    priority 10
+    when
+        var fact = TestFact1();
+    
+    then
+        RuleActions.NoOp();
+
+rule ""Metadata Rule 2""
+{
+    tag ""Metadata"", ""Test""
+    when
+        var fact = TestFact1();
+    
+    then
+        RuleActions.NoOp();
+}
+";
+            Repository.LoadText(text);
 
             var rules = Repository.GetRules().ToArray();
             Assert.Equal(2, rules.Length);
@@ -21,15 +44,132 @@ namespace NRules.RuleSharp.IntegrationTests
         }
 
         [Fact]
-        public void Load_RulesWithFactConditions_Loads()
+        public void Match_RulesWithFactConditions_Loads()
         {
-            Repository.Load(@"Rules\FactConditionTests.rs");
+            var text = @"
+using System;
+using NRules.RuleSharp.IntegrationTests.TestAssets;
+
+rule TestRule1
+when
+    var fact = TestFact1(x => x.StringProperty == ""Valid"" && x.IntProperty >= 0, x => x.BoolProperty);
+    
+then
+    RuleActions.NoOp();
+
+rule TestRule2
+when
+    var fact = TestFact1(x => x.StringProperty != ""Valid"" || x.IntProperty < 0, x => !x.BoolProperty);
+    
+then
+    RuleActions.NoOp();
+";
+            Repository.LoadText(text);
         }
 
         [Fact]
-        public void Load_MemberAccessTests_Loads()
+        public void Match_Exists_Loads()
         {
-            Repository.Load(@"Rules\MemberAccessTests.rs");
+            var text = @"
+using System;
+using NRules.RuleSharp.IntegrationTests.TestAssets;
+
+rule TestRule
+when
+    exists TestFact1(x => x.IntProperty > 0);
+    
+then
+    RuleActions.NoOp();
+";
+            Repository.LoadText(text);
+        }
+
+        [Fact]
+        public void Match_Not_Loads()
+        {
+            var text = @"
+using System;
+using NRules.RuleSharp.IntegrationTests.TestAssets;
+
+rule TestRule
+when
+    not TestFact1(x => x.IntProperty <= 0);
+    
+then
+    RuleActions.NoOp();
+";
+            Repository.LoadText(text);
+        }
+
+        [Fact]
+        public void MemberAccess_ArrayIndexAccess_Loads()
+        {
+            var text = @"
+using System;
+using NRules.RuleSharp.IntegrationTests.TestAssets;
+
+rule TestRule
+when
+    var fact = TestFact1();
+
+then
+    var itemLength = fact.ArrayProperty[0].Length;
+    RuleActions.NoOp();
+";
+            Repository.LoadText(text);
+        }
+
+        [Fact]
+        public void MemberAccess_ListIndexAccess_Loads()
+        {
+            var text = @"
+using System;
+using NRules.RuleSharp.IntegrationTests.TestAssets;
+
+rule TestRule
+when
+    var fact = TestFact1();
+
+then
+    var itemLength = fact.ListProperty[0].Length;
+    RuleActions.NoOp();
+";
+            Repository.LoadText(text);
+        }
+
+        [Fact]
+        public void MemberAccess_StringIndexAccess_Loads()
+        {
+            var text = @"
+using System;
+using NRules.RuleSharp.IntegrationTests.TestAssets;
+
+rule TestRule
+when
+    var fact = TestFact1();
+
+then
+    var charValue = fact.StringProperty[0];
+    RuleActions.NoOp();
+";
+            Repository.LoadText(text);
+        }
+
+        [Fact]
+        public void MemberAccess_DelegateInvoke_Loads()
+        {
+            var text = @"
+using System;
+using NRules.RuleSharp.IntegrationTests.TestAssets;
+
+rule TestRule
+when
+    var fact = TestFact1();
+
+then
+    RuleActions.GetAction()(""Test"");
+";
+            Repository.LoadText(text);
         }
     }
 }
