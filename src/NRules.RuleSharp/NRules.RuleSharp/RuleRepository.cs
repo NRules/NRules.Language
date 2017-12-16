@@ -72,21 +72,46 @@ namespace NRules.RuleSharp
         /// <param name="stream">Stream to load the rules from.</param>
         public void Load(Stream stream)
         {
+            var input = new AntlrInputStream(stream);
+            Load(input);
+        }
+
+        /// <summary>
+        /// Loads rules into the repository from a string.
+        /// </summary>
+        /// <param name="text">String containing the rules.</param>
+        public void LoadText(string text)
+        {
+            var reader = new StringReader(text);
+            LoadText(reader);
+        }
+        
+        /// <summary>
+        /// Loads rules into the repository from a text reader.
+        /// </summary>
+        /// <param name="reader">Text reader with the rules contents.</param>
+        public void LoadText(TextReader reader)
+        {
+            var input = new AntlrInputStream(reader);
+            Load(input);
+        }
+
+        private void Load(AntlrInputStream input)
+        {
             var loader = new TypeLoader(_references);
             var parserContext = new ParserContext(loader);
             var listener = new RuleSharpParserListener(parserContext, _defaultRuleSet);
 
-            var tree = ParseTree(stream);
+            var tree = ParseTree(input);
             var walker = new ParseTreeWalker();
             walker.Walk(listener, tree);
         }
 
-        private static IParseTree ParseTree(Stream inputStream)
+        private static IParseTree ParseTree(AntlrInputStream inputStream)
         {
             try
             {
-                var input = new AntlrInputStream(inputStream);
-                var lexer = new RuleSharpLexer(input);
+                var lexer = new RuleSharpLexer(inputStream);
                 var tokens = new CommonTokenStream(lexer);
                 var parser = new RuleSharpParser(tokens);
                 IParseTree tree = parser.compilation_unit();
