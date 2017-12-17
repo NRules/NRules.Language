@@ -114,7 +114,7 @@ namespace NRules.RuleSharp
 
         public override Expression VisitPrimary_expression(Primary_expressionContext context)
         {
-            var builder = new PrimaryExpressionBuilder(_parserContext.Loader);
+            var builder = new PrimaryExpressionBuilder(_parserContext);
             var pe = context.pe;
             builder.Context(pe);
             if (pe is LiteralExpressionContext l)

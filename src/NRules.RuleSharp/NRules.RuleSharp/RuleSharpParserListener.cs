@@ -20,14 +20,14 @@ namespace NRules.RuleSharp
         public override void EnterUsingNamespaceDirective(UsingNamespaceDirectiveContext context)
         {
             var @namespace = context.namespace_or_type_name().GetText();
-            _parserContext.Loader.AddNamespace(@namespace);
+            _parserContext.AddNamespace(@namespace);
         }
 
         public override void EnterUsingAliasDirective(UsingAliasDirectiveContext context)
         {
             var alias = context.identifier().GetText();
             var typeName = context.namespace_or_type_name().GetText();
-            _parserContext.Loader.AddAlias(alias, typeName);
+            _parserContext.AddAlias(alias, typeName);
         }
 
         public override void EnterRule_definition(Rule_definitionContext context)

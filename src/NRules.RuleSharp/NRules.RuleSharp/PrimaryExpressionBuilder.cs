@@ -9,16 +9,16 @@ namespace NRules.RuleSharp
 {
     internal class PrimaryExpressionBuilder
     {
-        private readonly TypeLoader _loader;
+        private readonly ParserContext _parserContext;
 
         private IParseTree _context;
         private Expression _expression;
         private Type _type;
         private string _name;
 
-        public PrimaryExpressionBuilder(TypeLoader loader)
+        public PrimaryExpressionBuilder(ParserContext parserContext)
         {
-            _loader = loader;
+            _parserContext = parserContext;
         }
 
         public Expression GetExpression()
@@ -49,7 +49,7 @@ namespace NRules.RuleSharp
 
             if (_type == null && _expression == null)
             {
-                _type = _loader.FindType(_name);
+                _type = _parserContext.FindType(_name);
                 if (_type != null)
                     _name = null;
             }
@@ -93,7 +93,7 @@ namespace NRules.RuleSharp
                 return;
             }
 
-            if (_loader.GetExtensionMethods(type, name).Any())
+            if (_parserContext.GetExtensionMethods(type, name).Any())
             {
                 NamePart(name);
                 return;
@@ -124,7 +124,7 @@ namespace NRules.RuleSharp
             var mi = type.GetMethod(methodName, argumentTypes);
             if (mi == null && instance != null)
             {
-                mi = _loader.FindExtensionMethod(type, methodName, argumentTypes);
+                mi = _parserContext.FindExtensionMethod(type, methodName, argumentTypes);
                 if (mi != null)
                 {
                     //In extension method instance is passed as the first argument

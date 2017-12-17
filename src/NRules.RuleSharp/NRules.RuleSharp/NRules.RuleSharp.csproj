@@ -80,6 +80,8 @@
     <Compile Include="RuleRepository.cs" />
     <Compile Include="SymbolTable.cs" />
     <Compile Include="TypeLoader.cs" />
+    <Compile Include="TypeMap.cs" />
+    <Compile Include="TypeMapExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Antlr4 Include="Grammar\RuleSharpLexer.g4">

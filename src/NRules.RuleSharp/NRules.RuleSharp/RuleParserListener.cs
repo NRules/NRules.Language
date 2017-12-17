@@ -55,12 +55,12 @@ namespace NRules.RuleSharp
         public override void EnterRuleFactMatch(RuleFactMatchContext context)
         {
             var patternTypeName = context.type().GetText();
-            var patternType = _parserContext.Loader.GetType(patternTypeName);
+            var patternType = _parserContext.GetType(patternTypeName);
 
             var variableTypeName = context.local_variable_type().VAR() == null
                 ? context.local_variable_type().type().GetText()
                 : patternTypeName;
-            var variableType = _parserContext.Loader.GetType(variableTypeName);
+            var variableType = _parserContext.GetType(variableTypeName);
 
             var id = context.identifier().GetText();
             _symbolTable.Declare(variableType, id);
@@ -81,7 +81,7 @@ namespace NRules.RuleSharp
         public override void EnterRuleExistsMatch(RuleExistsMatchContext context)
         {
             var patternTypeName = context.type().GetText();
-            var patternType = _parserContext.Loader.GetType(patternTypeName);
+            var patternType = _parserContext.GetType(patternTypeName);
 
             var existsBuilder = _groupBuilder.Exists();
             var patternBuilder = existsBuilder.Pattern(patternType);
@@ -100,7 +100,7 @@ namespace NRules.RuleSharp
         public override void EnterRuleNotMatch(RuleNotMatchContext context)
         {
             var patternTypeName = context.type().GetText();
-            var patternType = _parserContext.Loader.GetType(patternTypeName);
+            var patternType = _parserContext.GetType(patternTypeName);
 
             var existsBuilder = _groupBuilder.Not();
             var patternBuilder = existsBuilder.Pattern(patternType);

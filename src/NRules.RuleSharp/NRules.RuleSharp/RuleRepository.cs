@@ -12,8 +12,16 @@ namespace NRules.RuleSharp
     /// </summary>
     public class RuleRepository : IRuleRepository
     {
-        private readonly TypeLoader _loader = new TypeLoader();
+        private readonly TypeLoader _loader;
+        private readonly TypeMap _rootTypeMap;
         private readonly RuleSet _defaultRuleSet = new RuleSet("Default");
+
+        public RuleRepository()
+        {
+            _loader = new TypeLoader();
+            _rootTypeMap = new TypeMap(_loader);
+            _rootTypeMap.AddDefaultAliases();
+        }
 
         /// <summary>
         /// Retrieves all rule sets contained in the repository.
@@ -30,7 +38,7 @@ namespace NRules.RuleSharp
         /// <param name="namespace">Namespace to add to the default set of namespaces.</param>
         public void AddNamespace(string @namespace)
         {
-            _loader.AddNamespace(@namespace);
+            _rootTypeMap.AddNamespace(@namespace);
         }
 
         /// <summary>
@@ -107,7 +115,8 @@ namespace NRules.RuleSharp
 
         private void Load(AntlrInputStream input)
         {
-            var parserContext = new ParserContext(_loader);
+            var scopedTypeMap = new TypeMap(_loader, _rootTypeMap);
+            var parserContext = new ParserContext(_loader, scopedTypeMap);
             var listener = new RuleSharpParserListener(parserContext, _defaultRuleSet);
 
             var tree = ParseTree(input);
