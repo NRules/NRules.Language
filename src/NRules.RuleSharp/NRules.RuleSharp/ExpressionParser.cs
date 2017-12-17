@@ -11,12 +11,10 @@ namespace NRules.RuleSharp
     {
         private readonly ParserContext _parserContext;
         private readonly Stack<Type[]> _contextTypes = new Stack<Type[]>();
-        private SymbolTable _symbolTable;
 
-        public ExpressionParser(ParserContext parserContext, SymbolTable symbolTable, params Type[] contextTypes)
+        public ExpressionParser(ParserContext parserContext, params Type[] contextTypes)
         {
             _parserContext = parserContext;
-            _symbolTable = symbolTable;
             _contextTypes.Push(contextTypes);
         }
 
@@ -34,15 +32,9 @@ namespace NRules.RuleSharp
 
         public override Expression VisitBlock(BlockContext context)
         {
-            var parentTable = _symbolTable;
-            _symbolTable = new SymbolTable(parentTable);
-            try
+            using (_parserContext.PushScope())
             {
                 return Visit(context.statement_list());
-            }
-            finally
-            {
-                _symbolTable = parentTable;
             }
         }
 
@@ -54,7 +46,7 @@ namespace NRules.RuleSharp
             {
                 if (statementContext is DeclarationStatementContext)
                 {
-                    var declarationParser = new DeclarationParser(_parserContext, _symbolTable);
+                    var declarationParser = new DeclarationParser(_parserContext);
                     var declarationResult = declarationParser.Visit(statementContext);
                     declarations.AddRange(declarationResult.Declarations);
                     statements.AddRange(declarationResult.Initializers);
@@ -82,7 +74,7 @@ namespace NRules.RuleSharp
                 {
                     var parameter = (ParameterExpression)VisitExplicit_anonymous_function_parameter(parameterContext);
                     parameters.Add(parameter);
-                    _symbolTable.Declare(parameter);
+                    _parserContext.Scope.Declare(parameter);
                 }
             }
             else if (signatureContext.implicit_anonymous_function_parameter_list() != null)
@@ -95,7 +87,7 @@ namespace NRules.RuleSharp
                     var identifierType = contextTypes[index];
                     var parameter = Expression.Parameter(identifierType, identifier);
                     parameters.Add(parameter);
-                    _symbolTable.Declare(parameter);
+                    _parserContext.Scope.Declare(parameter);
                     index++;
                 }
             }
@@ -105,7 +97,7 @@ namespace NRules.RuleSharp
                 var identifierType = contextTypes.First();
                 var parameter = Expression.Parameter(identifierType, identifier);
                 parameters.Add(parameter);
-                _symbolTable.Declare(parameter);
+                _parserContext.Scope.Declare(parameter);
             }
 
             var body = VisitAnonymous_function_body(context.anonymous_function_body());
@@ -523,7 +515,7 @@ namespace NRules.RuleSharp
         public override Expression VisitIdentifier(IdentifierContext context)
         {
             var identifierName = context.GetText();
-            var identifier = _symbolTable.Lookup(identifierName);
+            var identifier = _parserContext.Scope.Lookup(identifierName);
             return identifier;
         }
     }

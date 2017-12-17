@@ -11,7 +11,6 @@ namespace NRules.RuleSharp
     internal class RuleParserListener : RuleSharpParserBaseListener
     {
         private readonly ParserContext _parserContext;
-        private readonly SymbolTable _symbolTable;
         private readonly RuleBuilder _builder;
         private readonly GroupBuilder _groupBuilder;
         private readonly ActionGroupBuilder _actionGroupBuilder;
@@ -19,7 +18,6 @@ namespace NRules.RuleSharp
         public RuleParserListener(ParserContext parserContext, RuleBuilder builder)
         {
             _parserContext = parserContext;
-            _symbolTable = new SymbolTable(parserContext.SymbolTable);
             _builder = builder;
             _groupBuilder = builder.LeftHandSide();
             _actionGroupBuilder = builder.RightHandSide();
@@ -63,17 +61,19 @@ namespace NRules.RuleSharp
             var variableType = _parserContext.GetType(variableTypeName);
 
             var id = context.identifier().GetText();
-            _symbolTable.Declare(variableType, id);
+            _parserContext.Scope.Declare(variableType, id);
 
             var patternBuilder = _groupBuilder.Pattern(patternType, id);
             if (context.expression_list() != null)
             {
                 foreach (var expressionContext in context.expression_list().expression())
                 {
-                    var localTable = new SymbolTable(_symbolTable);
-                    var expressionParser = new ExpressionParser(_parserContext, localTable, patternType);
-                    var expression = (LambdaExpression)expressionParser.Visit(expressionContext);
-                    patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
+                    using (_parserContext.PushScope())
+                    {
+                        var expressionParser = new ExpressionParser(_parserContext, patternType);
+                        var expression = (LambdaExpression) expressionParser.Visit(expressionContext);
+                        patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
+                    }
                 }
             }
         }
@@ -89,10 +89,12 @@ namespace NRules.RuleSharp
             {
                 foreach (var expressionContext in context.expression_list().expression())
                 {
-                    var localTable = new SymbolTable(_symbolTable);
-                    var expressionParser = new ExpressionParser(_parserContext, localTable, patternType);
-                    var expression = (LambdaExpression)expressionParser.Visit(expressionContext);
-                    patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
+                    using (_parserContext.PushScope())
+                    {
+                        var expressionParser = new ExpressionParser(_parserContext, patternType);
+                        var expression = (LambdaExpression) expressionParser.Visit(expressionContext);
+                        patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
+                    }
                 }
             }
         }
@@ -108,10 +110,12 @@ namespace NRules.RuleSharp
             {
                 foreach (var expressionContext in context.expression_list().expression())
                 {
-                    var localTable = new SymbolTable(_symbolTable);
-                    var expressionParser = new ExpressionParser(_parserContext, localTable, patternType);
-                    var expression = (LambdaExpression)expressionParser.Visit(expressionContext);
-                    patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
+                    using (_parserContext.PushScope())
+                    {
+                        var expressionParser = new ExpressionParser(_parserContext, patternType);
+                        var expression = (LambdaExpression) expressionParser.Visit(expressionContext);
+                        patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
+                    }
                 }
             }
         }
@@ -120,14 +124,15 @@ namespace NRules.RuleSharp
         {
             var contextParameter = Expression.Parameter(typeof(IContext), "context");
             var parameters = new List<ParameterExpression>{contextParameter};
-            parameters.AddRange(_symbolTable.Values);
+            parameters.AddRange(_parserContext.Scope.Values);
 
-            var localTable = new SymbolTable(_symbolTable);
-            var expressionParser = new ExpressionParser(_parserContext, localTable);
-            var block = expressionParser.Visit(context.statement_list());
-
-            var lambda = Expression.Lambda(block, parameters);
-            _actionGroupBuilder.DslAction(_actionGroupBuilder.Declarations, lambda);
+            using (_parserContext.PushScope())
+            {
+                var expressionParser = new ExpressionParser(_parserContext);
+                var block = expressionParser.Visit(context.statement_list());
+                var lambda = Expression.Lambda(block, parameters);
+                _actionGroupBuilder.DslAction(_actionGroupBuilder.Declarations, lambda);
+            }
         }
     }
 }

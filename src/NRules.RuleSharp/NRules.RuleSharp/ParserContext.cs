@@ -10,16 +10,29 @@ namespace NRules.RuleSharp
     {
         private readonly ITypeLoader _typeLoader;
         private readonly TypeMap _typeMap;
-        private readonly SymbolTable _symbolTable = new SymbolTable();
+        private readonly Stack<SymbolTable> _scopes = new Stack<SymbolTable>();
 
         public ParserContext(ITypeLoader typeLoader, TypeMap typeMap)
         {
             _typeLoader = typeLoader;
             _typeMap = typeMap;
+            _scopes.Push(new SymbolTable());
         }
 
-        public SymbolTable SymbolTable => _symbolTable;
+        public SymbolTable Scope => _scopes.Peek();
 
+        public IDisposable PushScope()
+        {
+            var symbolTable = new SymbolTable(_scopes.Peek());
+            _scopes.Push(symbolTable);
+            return new ScopeGuard(this);
+        }
+
+        public void PopScope()
+        {
+            _scopes.Pop();
+        }
+        
         public void AddNamespace(string @namespace)
         {
             _typeMap.AddNamespace(@namespace);
@@ -61,6 +74,21 @@ namespace NRules.RuleSharp
                 .Where(method => method.IsDefined(typeof(ExtensionAttribute), false))
                 .Where(method => method.GetParameters()[0].ParameterType == extendedType);
             return extensionMethods;
+        }
+
+        private class ScopeGuard : IDisposable
+        {
+            private readonly ParserContext _context;
+
+            public ScopeGuard(ParserContext context)
+            {
+                _context = context;
+            }
+
+            public void Dispose()
+            {
+                _context.PopScope();
+            }
         }
     }
 }

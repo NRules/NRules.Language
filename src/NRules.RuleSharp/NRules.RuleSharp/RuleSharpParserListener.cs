@@ -34,9 +34,12 @@ namespace NRules.RuleSharp
         {
             var builder = new RuleBuilder();
 
-            var expressionListener = new RuleParserListener(_parserContext, builder);
-            var walker = new ParseTreeWalker();
-            walker.Walk(expressionListener, context);
+            using (_parserContext.PushScope())
+            {
+                var expressionListener = new RuleParserListener(_parserContext, builder);
+                var walker = new ParseTreeWalker();
+                walker.Walk(expressionListener, context);
+            }
 
             var rule = builder.Build();
             _ruleSet.Add(Enumerable.Repeat(rule, 1));
