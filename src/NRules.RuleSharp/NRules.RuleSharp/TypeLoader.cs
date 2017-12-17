@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace NRules.RuleSharp
 {
@@ -30,6 +31,30 @@ namespace NRules.RuleSharp
             AddAlias("short", "System.Int16");
             AddAlias("ushort", "System.UInt16");
             AddAlias("string", "System.String");
+        }
+
+        public MethodInfo FindExtensionMethod(Type type, string methodName, Type[] argumentTypes)
+        {
+            var binder = Type.DefaultBinder;
+            if (binder == null)
+                throw new InvalidOperationException("Default type binder cannot be found");
+
+            var methodCandidates = GetExtensionMethods(type, methodName).Cast<MethodBase>().ToArray();
+            argumentTypes = Enumerable.Repeat(type, 1).Concat(argumentTypes).ToArray();
+            var mi = binder.SelectMethod(BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod, methodCandidates, argumentTypes, null) as MethodInfo;
+            return mi;
+        }
+
+        public IEnumerable<MethodInfo> GetExtensionMethods(Type extendedType, string methodName)
+        {
+            var extensionMethods = _assemblies
+                .SelectMany(assembly => assembly.GetTypes())
+                .Where(type => type.IsSealed && !type.IsGenericType && !type.IsNested)
+                .SelectMany(type => type.GetMethods(BindingFlags.Static | BindingFlags.Public))
+                .Where(method => method.Name == methodName)
+                .Where(method => method.IsDefined(typeof(ExtensionAttribute), false))
+                .Where(method => method.GetParameters()[0].ParameterType == extendedType);
+            return extensionMethods;
         }
 
         public Type GetType(string typeName)

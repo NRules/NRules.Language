@@ -93,6 +93,12 @@ namespace NRules.RuleSharp
                 return;
             }
 
+            if (_loader.GetExtensionMethods(type, name).Any())
+            {
+                NamePart(name);
+                return;
+            }
+
             throw new CompilationException($"Type member not found. Type={type}, Member={name}", _context);
         }
 
@@ -116,6 +122,16 @@ namespace NRules.RuleSharp
         {
             var argumentTypes = argumentsList.Select(x => x.Type).ToArray();
             var mi = type.GetMethod(methodName, argumentTypes);
+            if (mi == null && instance != null)
+            {
+                mi = _loader.FindExtensionMethod(type, methodName, argumentTypes);
+                if (mi != null)
+                {
+                    //In extension method instance is passed as the first argument
+                    argumentsList.Insert(0, instance);
+                    instance = null;
+                }
+            }
             if (mi == null)
             {
                 throw new CompilationException($"Method not found. Type={type}, Method={methodName}", _context);

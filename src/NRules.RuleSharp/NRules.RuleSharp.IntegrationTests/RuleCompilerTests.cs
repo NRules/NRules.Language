@@ -171,5 +171,24 @@ then
 ";
             Repository.LoadText(text);
         }
+
+        [Fact]
+        public void MemberAccess_ExtensionMethod_Loads()
+        {
+            var text = @"
+using System;
+using NRules.RuleSharp.IntegrationTests.TestAssets;
+
+rule TestRule
+when
+    var fact = TestFact1();
+
+then
+    fact.ExtensionMethod();
+    fact.ExtensionMethod(fact.IntProperty);
+    fact.ExtensionMethod(fact.StringProperty);
+";
+            Repository.LoadText(text);
+        }
     }
 }
