@@ -4,6 +4,7 @@
     {
         protected BaseRuleTestFixture()
         {
+            Repository.AddNamespace("System");
             Repository.AddReference(typeof(BaseRuleTestFixture).Assembly);
         }
 

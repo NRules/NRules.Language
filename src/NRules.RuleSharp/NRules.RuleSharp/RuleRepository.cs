@@ -12,7 +12,7 @@ namespace NRules.RuleSharp
     /// </summary>
     public class RuleRepository : IRuleRepository
     {
-        private readonly List<Assembly> _references = new List<Assembly>();
+        private readonly TypeLoader _loader = new TypeLoader();
         private readonly RuleSet _defaultRuleSet = new RuleSet("Default");
 
         /// <summary>
@@ -25,12 +25,21 @@ namespace NRules.RuleSharp
         }
 
         /// <summary>
+        /// Adds a namespace that applies to all rules loaded to the repository.
+        /// </summary>
+        /// <param name="namespace">Namespace to add to the default set of namespaces.</param>
+        public void AddNamespace(string @namespace)
+        {
+            _loader.AddNamespace(@namespace);
+        }
+
+        /// <summary>
         /// Adds reference assemblies for types used in the rules.
         /// </summary>
         /// <param name="assemblies">Reference assemblies.</param>
         public void AddReferences(IEnumerable<Assembly> assemblies)
         {
-            _references.AddRange(assemblies);
+            _loader.AddReferences(assemblies);
         }
 
         /// <summary>
@@ -39,7 +48,7 @@ namespace NRules.RuleSharp
         /// <param name="assembly">Reference assembly.</param>
         public void AddReference(Assembly assembly)
         {
-            _references.Add(assembly);
+            _loader.AddReference(assembly);
         }
 
         /// <summary>
@@ -98,8 +107,7 @@ namespace NRules.RuleSharp
 
         private void Load(AntlrInputStream input)
         {
-            var loader = new TypeLoader(_references);
-            var parserContext = new ParserContext(loader);
+            var parserContext = new ParserContext(_loader);
             var listener = new RuleSharpParserListener(parserContext, _defaultRuleSet);
 
             var tree = ParseTree(input);

@@ -8,14 +8,12 @@ namespace NRules.RuleSharp
 {
     internal class TypeLoader
     {
-        private readonly Assembly[] _assemblies;
-        private readonly List<string> _usings = new List<string>();
+        private readonly List<Assembly> _references = new List<Assembly>();
+        private readonly List<string> _namespaces = new List<string>();
         private readonly Dictionary<string, string> _aliases = new Dictionary<string, string>();
         
-        public TypeLoader(IEnumerable<Assembly> assemblies)
+        public TypeLoader()
         {
-            _assemblies = assemblies.ToArray();
-
             AddAlias("bool", "System.Boolean");
             AddAlias("byte", "System.Byte");
             AddAlias("sbyte", "System.SByte");
@@ -47,7 +45,7 @@ namespace NRules.RuleSharp
 
         public IEnumerable<MethodInfo> GetExtensionMethods(Type extendedType, string methodName)
         {
-            var extensionMethods = _assemblies
+            var extensionMethods = _references
                 .SelectMany(assembly => assembly.GetTypes())
                 .Where(type => type.IsSealed && !type.IsGenericType && !type.IsNested)
                 .SelectMany(type => type.GetMethods(BindingFlags.Static | BindingFlags.Public))
@@ -73,7 +71,7 @@ namespace NRules.RuleSharp
             type = FindTypeByName(typeName);
             if (type != null) return type;
 
-            foreach (var @namespace in _usings)
+            foreach (var @namespace in _namespaces)
             {
                 var qualifiedTypeName = $"{@namespace}.{typeName}";
                 type = FindTypeByName(qualifiedTypeName);
@@ -97,7 +95,7 @@ namespace NRules.RuleSharp
             Type type = Type.GetType(typeName);
             if (type != null) return type;
 
-            foreach (var assembly in _assemblies)
+            foreach (var assembly in _references)
             {
                 type = assembly.GetType(typeName);
                 if (type != null)
@@ -108,14 +106,24 @@ namespace NRules.RuleSharp
             return null;
         }
 
-        public void AddNamespace(string @using)
+        public void AddNamespace(string @namespace)
         {
-            _usings.Add(@using);
+            _namespaces.Add(@namespace);
         }
 
         public void AddAlias(string alias, string typeName)
         {
             _aliases[alias] = typeName;
+        }
+
+        public void AddReferences(IEnumerable<Assembly> assemblies)
+        {
+            _references.AddRange(assemblies);
+        }
+
+        public void AddReference(Assembly assembly)
+        {
+            _references.Add(assembly);
         }
     }
 }
