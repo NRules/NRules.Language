@@ -44,5 +44,10 @@ namespace NRules.RuleSharp
             var rule = builder.Build();
             _ruleSet.Add(Enumerable.Repeat(rule, 1));
         }
+
+        public override void EnterType_declaration(Type_declarationContext context)
+        {
+            throw new CompilationException("Unsupported expression. ExpressionType=type declaration", context);
+        }
     }
 }

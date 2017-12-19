@@ -234,6 +234,11 @@ namespace NRules.RuleSharp
             return expression;
         }
 
+        public override Expression VisitQuery_expression(Query_expressionContext context)
+        {
+            throw new CompilationException("Unsupported expression. ExpressionType=query expression", context);
+        }
+
         public override Expression VisitUnary_expression(Unary_expressionContext context)
         {
             if (context.primary_expression() != null)
