@@ -5,6 +5,7 @@
         protected BaseRuleTestFixture()
         {
             Repository.AddNamespace("System");
+            Repository.AddNamespace("NRules.RuleSharp.IntegrationTests.TestAssets");
             Repository.AddReference(typeof(BaseRuleTestFixture).Assembly);
         }
 

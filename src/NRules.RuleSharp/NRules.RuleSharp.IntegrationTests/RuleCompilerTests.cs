@@ -44,22 +44,68 @@ rule ""Metadata Rule 2""
         }
 
         [Fact]
-        public void Match_RulesWithFactConditions_Loads()
+        public void Match_Equals_Loads()
         {
             var text = @"
-using System;
-using NRules.RuleSharp.IntegrationTests.TestAssets;
-
 rule TestRule1
 when
-    var fact = TestFact1(x => x.StringProperty == ""Valid"" && x.IntProperty >= 0, x => x.BoolProperty);
+    var fact = TestFact1(x => x.StringProperty == ""Valid"", x => x.StringProperty != ""Valid"");
     
 then
     RuleActions.NoOp();
+";
+            Repository.LoadText(text);
+        }
 
-rule TestRule2
+        [Fact]
+        public void Match_And_Loads()
+        {
+            var text = @"
+rule TestRule1
 when
-    var fact = TestFact1(x => x.StringProperty != ""Valid"" || x.IntProperty < 0, x => !x.BoolProperty);
+    var fact = TestFact1(x => x.IntProperty >= 0 && x.IntProperty < 10);
+    
+then
+    RuleActions.NoOp();
+";
+            Repository.LoadText(text);
+        }
+
+        [Fact]
+        public void Match_Or_Loads()
+        {
+            var text = @"
+rule TestRule1
+when
+    var fact = TestFact1(x => x.IntProperty <= 0 || x.IntProperty > 10);
+    
+then
+    RuleActions.NoOp();
+";
+            Repository.LoadText(text);
+        }
+
+        [Fact]
+        public void Match_Boolean_Loads()
+        {
+            var text = @"
+rule TestRule1
+when
+    var fact = TestFact1(x => x.BoolProperty);
+    
+then
+    RuleActions.NoOp();
+";
+            Repository.LoadText(text);
+        }
+
+        [Fact]
+        public void Match_BooleanNot_Loads()
+        {
+            var text = @"
+rule TestRule1
+when
+    var fact = TestFact1(x => !x.BoolProperty);
     
 then
     RuleActions.NoOp();
@@ -71,9 +117,6 @@ then
         public void Match_Exists_Loads()
         {
             var text = @"
-using System;
-using NRules.RuleSharp.IntegrationTests.TestAssets;
-
 rule TestRule
 when
     exists TestFact1(x => x.IntProperty > 0);
@@ -88,9 +131,6 @@ then
         public void Match_Not_Loads()
         {
             var text = @"
-using System;
-using NRules.RuleSharp.IntegrationTests.TestAssets;
-
 rule TestRule
 when
     not TestFact1(x => x.IntProperty <= 0);
@@ -105,9 +145,6 @@ then
         public void MemberAccess_ArrayIndexAccess_Loads()
         {
             var text = @"
-using System;
-using NRules.RuleSharp.IntegrationTests.TestAssets;
-
 rule TestRule
 when
     var fact = TestFact1();
@@ -123,9 +160,6 @@ then
         public void MemberAccess_ListIndexAccess_Loads()
         {
             var text = @"
-using System;
-using NRules.RuleSharp.IntegrationTests.TestAssets;
-
 rule TestRule
 when
     var fact = TestFact1();
@@ -141,9 +175,6 @@ then
         public void MemberAccess_StringIndexAccess_Loads()
         {
             var text = @"
-using System;
-using NRules.RuleSharp.IntegrationTests.TestAssets;
-
 rule TestRule
 when
     var fact = TestFact1();
@@ -159,9 +190,6 @@ then
         public void MemberAccess_DelegateInvoke_Loads()
         {
             var text = @"
-using System;
-using NRules.RuleSharp.IntegrationTests.TestAssets;
-
 rule TestRule
 when
     var fact = TestFact1();
@@ -176,9 +204,6 @@ then
         public void MemberAccess_ExtensionMethod_Loads()
         {
             var text = @"
-using System;
-using NRules.RuleSharp.IntegrationTests.TestAssets;
-
 rule TestRule
 when
     var fact = TestFact1();

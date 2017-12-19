@@ -128,7 +128,9 @@ namespace NRules.RuleSharp
                 }
                 else
                 {
-                    //TODO: handle generics
+                    if (sn.type_argument_list() != null)
+                        throw new CompilationException("Unsupported expression. ExpressionType=type arguments", context);
+
                     builder.NamePart(sn.GetText());
                 }
             }
@@ -229,6 +231,40 @@ namespace NRules.RuleSharp
             }
 
             var expression = builder.GetExpression();
+            return expression;
+        }
+
+        public override Expression VisitUnary_expression(Unary_expressionContext context)
+        {
+            if (context.primary_expression() != null)
+            {
+                return Visit(context.primary_expression());
+            }
+
+            var expression = Visit(context.unary_expression());
+            if (context.type() != null)
+            {
+                var type = _parserContext.GetType(context.type().GetText());
+                return Expression.Convert(expression, type);
+            }
+
+            var op = context.children[0].GetText();
+            if (op == "!" || op == "~")
+            {
+                expression = Expression.Not(expression);
+            }
+            else if (op == "+")
+            {
+                //Keep the expression
+            }
+            else if (op == "-")
+            {
+                expression = Expression.Negate(expression);
+            }
+            else
+            {
+                throw new CompilationException($"Unsupported operation. Operation={op}", context);
+            }
             return expression;
         }
 
