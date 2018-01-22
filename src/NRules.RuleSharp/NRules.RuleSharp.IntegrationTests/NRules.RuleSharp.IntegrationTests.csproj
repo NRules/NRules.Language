@@ -31,11 +31,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NRules, Version=0.8.0.0, Culture=neutral, PublicKeyToken=8ad544355a4a2176, processorArchitecture=MSIL">
-      <HintPath>..\packages\NRules.Runtime.0.8.0\lib\net45\NRules.dll</HintPath>
+    <Reference Include="NRules, Version=0.8.2.0, Culture=neutral, PublicKeyToken=8ad544355a4a2176, processorArchitecture=MSIL">
+      <HintPath>..\packages\NRules.Runtime.0.8.2\lib\net45\NRules.dll</HintPath>
     </Reference>
-    <Reference Include="NRules.RuleModel, Version=0.8.0.0, Culture=neutral, PublicKeyToken=8ad544355a4a2176, processorArchitecture=MSIL">
-      <HintPath>..\packages\NRules.RuleModel.0.8.0\lib\net45\NRules.RuleModel.dll</HintPath>
+    <Reference Include="NRules.RuleModel, Version=0.8.2.0, Culture=neutral, PublicKeyToken=8ad544355a4a2176, processorArchitecture=MSIL">
+      <HintPath>..\packages\NRules.RuleModel.0.8.2\lib\net45\NRules.RuleModel.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
