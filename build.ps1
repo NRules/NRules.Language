@@ -30,6 +30,11 @@ $components = @{
                 )
             }
         }
+        package = @{
+            nuget = @(
+                'NRules.RuleSharp'
+            )
+        }
     };
 }
 
