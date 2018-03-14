@@ -30,7 +30,6 @@ namespace Domain
     {
         public string Name { get; set; }
         public bool IsPreferred { get; set; }
-        public DateTime Since { get; set; }
     }
     
     public class Order
