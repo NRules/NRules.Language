@@ -33,6 +33,7 @@ rule ""Metadata Rule 2""
 }
 ";
             Repository.LoadText(text);
+            Repository.Compile();
 
             var rules = Repository.GetRules().ToArray();
             Assert.Equal(2, rules.Length);
@@ -47,70 +48,75 @@ rule ""Metadata Rule 2""
         public void Match_Equals_Loads()
         {
             var text = @"
-rule TestRule1
+rule TestRule
 when
     var fact = TestFact1(x => x.StringProperty == ""Valid"", x => x.StringProperty != ""Valid"");
     
 then
-    RuleActions.NoOp();
+    RuleActions.NoOp(fact);
 ";
             Repository.LoadText(text);
+            Repository.Compile();
         }
 
         [Fact]
         public void Match_And_Loads()
         {
             var text = @"
-rule TestRule1
+rule TestRule
 when
     var fact = TestFact1(x => x.IntProperty >= 0 && x.IntProperty < 10);
     
 then
-    RuleActions.NoOp();
+    RuleActions.NoOp(fact);
 ";
             Repository.LoadText(text);
+            Repository.Compile();
         }
 
         [Fact]
         public void Match_Or_Loads()
         {
             var text = @"
-rule TestRule1
+rule TestRule
 when
     var fact = TestFact1(x => x.IntProperty <= 0 || x.IntProperty > 10);
     
 then
-    RuleActions.NoOp();
+    RuleActions.NoOp(fact);
 ";
             Repository.LoadText(text);
+            Repository.Compile();
         }
 
         [Fact]
         public void Match_Boolean_Loads()
         {
             var text = @"
-rule TestRule1
+rule TestRule
 when
     var fact = TestFact1(x => x.BoolProperty);
     
 then
-    RuleActions.NoOp();
+    RuleActions.NoOp(fact);
 ";
             Repository.LoadText(text);
+            Repository.Compile();
         }
 
         [Fact]
         public void Match_BooleanNot_Loads()
         {
             var text = @"
-rule TestRule1
+rule TestRule
 when
     var fact = TestFact1(x => !x.BoolProperty);
     
 then
-    RuleActions.NoOp();
+    RuleActions.NoOp(fact);
 ";
             Repository.LoadText(text);
+            Repository.Compile();
         }
 
         [Fact]
@@ -125,6 +131,7 @@ then
     RuleActions.NoOp();
 ";
             Repository.LoadText(text);
+            Repository.Compile();
         }
 
         [Fact]
@@ -139,6 +146,7 @@ then
     RuleActions.NoOp();
 ";
             Repository.LoadText(text);
+            Repository.Compile();
         }
 
         [Fact]
@@ -151,9 +159,10 @@ when
 
 then
     var itemLength = fact.ArrayProperty[0].Length;
-    RuleActions.NoOp();
+    RuleActions.NoOp(fact);
 ";
             Repository.LoadText(text);
+            Repository.Compile();
         }
 
         [Fact]
@@ -166,9 +175,10 @@ when
 
 then
     var itemLength = fact.ListProperty[0].Length;
-    RuleActions.NoOp();
+    RuleActions.NoOp(fact);
 ";
             Repository.LoadText(text);
+            Repository.Compile();
         }
 
         [Fact]
@@ -181,9 +191,10 @@ when
 
 then
     var charValue = fact.StringProperty[0];
-    RuleActions.NoOp();
+    RuleActions.NoOp(fact);
 ";
             Repository.LoadText(text);
+            Repository.Compile();
         }
 
         [Fact]
@@ -198,6 +209,7 @@ then
     RuleActions.GetAction()(""Test"");
 ";
             Repository.LoadText(text);
+            Repository.Compile();
         }
 
         [Fact]
@@ -214,6 +226,39 @@ then
     fact.ExtensionMethod(fact.StringProperty);
 ";
             Repository.LoadText(text);
+            Repository.Compile();
+        }
+
+        [Fact]
+        public void Match_JoinFact_Loads()
+        {
+            var text = @"
+rule TestRule
+when
+    var fact1 = TestFact1(x => x.StringProperty == ""Valid"");
+    var fact2 = TestFact2(x => x.Fact1 == fact1);
+    
+then
+    RuleActions.NoOp(fact1, fact2);
+";
+            Repository.LoadText(text);
+            Repository.Compile();
+        }
+
+        [Fact]
+        public void Match_JoinFactProperty_Loads()
+        {
+            var text = @"
+rule TestRule
+when
+    var fact1 = TestFact1(x => x.StringProperty == ""Valid"");
+    var fact2 = TestFact2(x => x.StringProperty == fact1.StringProperty);
+    
+then
+    RuleActions.NoOp(fact1, fact2);
+";
+            Repository.LoadText(text);
+            Repository.Compile();
         }
     }
 }
