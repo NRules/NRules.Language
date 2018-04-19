@@ -3,7 +3,7 @@ param (
     [string]$component = 'Core'
 )
 
-$version = '0.0.2'
+$version = '0.0.3'
 $configuration = 'Release'
 
 if (Test-Path Env:CI) { $version = $Env:APPVEYOR_BUILD_VERSION }
