@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using NRules.RuleModel;
@@ -31,25 +30,19 @@ namespace NRules.RuleSharp
             Parameters.AddRange(expression.Parameters);
         }
 
-        protected override Expression VisitMember(MemberExpression member)
+        protected override Expression VisitParameter(ParameterExpression parameter)
         {
-            if (Declarations.TryGetValue(member.Member.Name, out var declaration))
+            if (Declarations.TryGetValue(parameter.Name, out var declaration))
             {
-                ParameterExpression parameter = Parameters.FirstOrDefault(p => p.Name == declaration.Name);
-                if (parameter == null)
+                var existingParameter = Parameters.FirstOrDefault(p => p.Name == declaration.Name);
+                if (existingParameter == null)
                 {
-                    parameter = declaration.ToParameterExpression();
                     Parameters.Add(parameter);
-                }
-                else if (parameter.Type != declaration.Type)
-                {
-                    throw new ArgumentException(
-                        $"Expression parameter type mismatch. Name={declaration.Name}, ExpectedType={declaration.Type}, FoundType={parameter.Type}");
                 }
                 return parameter;
             }
 
-            return base.VisitMember(member);
+            return base.VisitParameter(parameter);
         }
     }
 }
