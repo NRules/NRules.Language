@@ -67,6 +67,7 @@
     <Compile Include="TestAssets\BaseRuleTestFixture.cs" />
     <Compile Include="TestAssets\FactExtensions.cs" />
     <Compile Include="TestAssets\RuleActions.cs" />
+    <Compile Include="TestAssets\ActionResult.cs" />
     <Compile Include="TestAssets\TestFact1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RuleCompilerTests.cs" />

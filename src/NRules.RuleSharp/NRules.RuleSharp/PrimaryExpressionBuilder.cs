@@ -55,6 +55,12 @@ namespace NRules.RuleSharp
             }
         }
 
+        public void TypeName(string typeName)
+        {
+            _type = _parserContext.GetType(typeName);
+            _name = null;
+        }
+
         public void Member(string name)
         {
             if (_expression != null)
@@ -102,6 +108,50 @@ namespace NRules.RuleSharp
             throw new CompilationException($"Type member not found. Type={type}, Member={name}", _context);
         }
 
+        public NewExpression Constructor(List<Expression> argumentsList)
+        {
+            var argumentTypes = argumentsList.Select(x => x.Type).ToArray();
+            var ci = _type.GetConstructor(argumentTypes);
+            if (ci == null)
+            {
+                var argString = string.Join(",", argumentTypes.Cast<Type>());
+                throw new CompilationException($"Constructor not found. Type={_type}, Arguments={argString}", _context);
+            }
+            var arguments = EnsureArgumentTypes(argumentsList, ci);
+            var newExpression = Expression.New(ci, arguments);
+            SetExpression(newExpression);
+            return newExpression;
+        }
+
+        public MemberBinding Bind(string name, Expression expression)
+        {
+            if (_type == null)
+            {
+                throw new CompilationException($"Binding a value requires a type. Name={name}", _context);
+            }
+            
+            MemberInfo member = _type.GetProperty(name);
+            if (member == null)
+            {
+                member = _type.GetField(name);
+            }
+
+            if (member == null)
+            {
+                throw new CompilationException($"Type member not found. Type={_type}, Member={name}", _context);
+            }
+
+            var binding = Expression.Bind(member, expression);
+            return binding;
+        }
+
+        public void MemberInit(NewExpression newExpression, List<MemberBinding> bindingList)
+        {
+            if (!bindingList.Any()) return;
+
+            SetExpression(Expression.MemberInit(newExpression, bindingList));
+        }
+
         public void Method(List<Expression> argumentsList)
         {
             if (_expression != null)
@@ -134,7 +184,8 @@ namespace NRules.RuleSharp
             }
             if (mi == null)
             {
-                throw new CompilationException($"Method not found. Type={type}, Method={methodName}", _context);
+                var argString = string.Join(",", argumentTypes.Cast<Type>());
+                throw new CompilationException($"Method not found. Type={type}, Method={methodName}, Arguments={argString}", _context);
             }
             var arguments = EnsureArgumentTypes(argumentsList, mi);
             SetExpression(Expression.Call(instance, mi, arguments));
@@ -168,9 +219,9 @@ namespace NRules.RuleSharp
             _name = null;
         }
 
-        private static IEnumerable<Expression> EnsureArgumentTypes(List<Expression> argumentsList, MethodInfo mi)
+        private static IEnumerable<Expression> EnsureArgumentTypes(List<Expression> argumentsList, MethodBase mb)
         {
-            var methodArguments = mi.GetParameters();
+            var methodArguments = mb.GetParameters();
             for (int i = 0; i < argumentsList.Count; i++)
             {
                 if (argumentsList[i].Type != methodArguments[i].ParameterType)

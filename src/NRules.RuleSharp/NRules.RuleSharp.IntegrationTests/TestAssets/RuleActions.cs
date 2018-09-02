@@ -16,6 +16,10 @@ namespace NRules.RuleSharp.IntegrationTests.TestAssets
         {
         }
 
+        public static void Add(object value)
+        {
+        }
+
         public static Action<string> GetAction()
         {
             return s => { };

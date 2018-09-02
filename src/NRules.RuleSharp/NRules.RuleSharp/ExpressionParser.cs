@@ -139,9 +139,31 @@ namespace NRules.RuleSharp
                 var innerExpression = Visit(pre.expression());
                 builder.ExpressionStart(innerExpression);
             }
-            else if (pe is ObjectCreationExpressionContext)
+            else if (pe is ObjectCreationExpressionContext oce)
             {
-                throw new CompilationException("Unsupported expression. ExpressionType=object creation", context);
+                var typeName = oce.type().GetText();
+                builder.TypeName(typeName);
+
+                if (oce.object_creation_expression() != null ||
+                    oce.object_or_collection_initializer() != null)
+                {
+                    var argList = oce.object_creation_expression()?.argument_list();
+                    var argumentList = ParseArgumentsList(argList);
+
+                    var initializer = oce.object_or_collection_initializer()
+                        ?? oce.object_creation_expression()?.object_or_collection_initializer();
+                    var initList = initializer
+                        ?.object_initializer()
+                        ?.member_initializer_list();
+                    var bindingList = ParseBindingList(builder, initList);
+
+                    var ctor = builder.Constructor(argumentList);
+                    builder.MemberInit(ctor, bindingList);
+                }
+                else
+                {
+                    throw new CompilationException("Unsupported expression. ExpressionType=object creation", context);
+                }
             }
             else if (pe is MemberAccessExpressionContext pt)
             {
@@ -198,15 +220,7 @@ namespace NRules.RuleSharp
                 }
                 else if (child is Method_invocationContext mi)
                 {
-                    var argumentsList = new List<Expression>();
-                    if (mi.argument_list() != null)
-                    {
-                        foreach (var argumentContext in mi.argument_list().argument())
-                        {
-                            var argument = Visit(argumentContext);
-                            argumentsList.Add(argument);
-                        }
-                    }
+                    var argumentsList = ParseArgumentsList(mi.argument_list());
                     builder.Method(argumentsList);
                 }
                 else if (child is Bracket_expressionContext be)
@@ -558,6 +572,38 @@ namespace NRules.RuleSharp
             var identifierName = context.GetText();
             var identifier = _parserContext.Scope.Lookup(identifierName);
             return identifier;
+        }
+
+        private List<Expression> ParseArgumentsList(Argument_listContext argumentListContext)
+        {
+            var argumentsList = new List<Expression>();
+            if (argumentListContext != null)
+            {
+                foreach (var argumentContext in argumentListContext.argument())
+                {
+                    var argument = Visit(argumentContext);
+                    argumentsList.Add(argument);
+                }
+            }
+
+            return argumentsList;
+        }
+
+        private List<MemberBinding> ParseBindingList(PrimaryExpressionBuilder builder, Member_initializer_listContext initList)
+        {
+            var bindingList = new List<MemberBinding>();
+            if (initList != null)
+            {
+                foreach (var initContext in initList.member_initializer())
+                {
+                    var name = initContext.identifier().GetText();
+                    var valueExpression = Visit(initContext.initializer_value());
+                    var binding = builder.Bind(name, valueExpression);
+                    bindingList.Add(binding);
+                }
+            }
+
+            return bindingList;
         }
     }
 }
