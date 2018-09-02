@@ -122,12 +122,14 @@ namespace NRules.RuleSharp
 
         public override void EnterRule_action(Rule_actionContext context)
         {
-            var contextParameter = Expression.Parameter(typeof(IContext), "context");
+            var contextParameter = Expression.Parameter(typeof(IContext), "Context");
             var parameters = new List<ParameterExpression>{contextParameter};
             parameters.AddRange(_parserContext.Scope.Values);
 
             using (_parserContext.PushScope())
             {
+                _parserContext.Scope.Declare(contextParameter);
+
                 var expressionParser = new ExpressionParser(_parserContext);
                 var block = expressionParser.Visit(context.statement_list());
                 var lambda = Expression.Lambda(block, parameters);
