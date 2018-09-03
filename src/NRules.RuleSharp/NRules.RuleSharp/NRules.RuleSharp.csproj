@@ -22,10 +22,10 @@
 
   <ItemGroup>
     <Antlr4 Update="Grammar\RuleSharpLexer.g4">
-      <CustomToolNamespace>NRules.RuleSharp</CustomToolNamespace>
+      <CustomToolNamespace>NRules.RuleSharp.Parser</CustomToolNamespace>
     </Antlr4>
     <Antlr4 Update="Grammar\RuleSharpParser.g4">
-      <CustomToolNamespace>NRules.RuleSharp</CustomToolNamespace>
+      <CustomToolNamespace>NRules.RuleSharp.Parser</CustomToolNamespace>
     </Antlr4>
   </ItemGroup>
   

@@ -2,7 +2,8 @@
 using Antlr4.Runtime.Tree;
 using NRules.RuleModel;
 using NRules.RuleModel.Builders;
-using static NRules.RuleSharp.RuleSharpParser;
+using NRules.RuleSharp.Parser;
+using static NRules.RuleSharp.Parser.RuleSharpParser;
 
 namespace NRules.RuleSharp
 {

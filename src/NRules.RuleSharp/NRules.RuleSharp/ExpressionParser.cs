@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Antlr4.Runtime.Tree;
-using static NRules.RuleSharp.RuleSharpParser;
+using NRules.RuleSharp.Parser;
+using static NRules.RuleSharp.Parser.RuleSharpParser;
 
 namespace NRules.RuleSharp
 {
