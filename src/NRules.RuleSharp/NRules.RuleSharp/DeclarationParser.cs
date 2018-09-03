@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
-using static NRules.RuleSharp.RuleSharpParser;
+using NRules.RuleSharp.Parser;
+using static NRules.RuleSharp.Parser.RuleSharpParser;
 
 namespace NRules.RuleSharp
 {

@@ -4,6 +4,7 @@ using System.Reflection;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using NRules.RuleModel;
+using NRules.RuleSharp.Parser;
 
 namespace NRules.RuleSharp
 {

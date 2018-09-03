@@ -260,5 +260,53 @@ then
             Repository.LoadText(text);
             Repository.Compile();
         }
+
+        [Fact]
+        public void Match_ActionNewObject_Loads()
+        {
+            var text = @"
+rule TestRule
+when
+    var fact = TestFact1();
+    
+then
+    var result = new ActionResult(""Result"");
+    RuleActions.Add(result);
+";
+            Repository.LoadText(text);
+            Repository.Compile();
+        }
+
+        [Fact]
+        public void Match_ActionNewObjectWithInitializer_Loads()
+        {
+            var text = @"
+rule TestRule
+when
+    var fact = TestFact1();
+    
+then
+    var result = new ActionResult{Result = ""Result""};
+    RuleActions.Add(result);
+";
+            Repository.LoadText(text);
+            Repository.Compile();
+        }
+
+        [Fact]
+        public void Match_ActionInsertNewFact_Loads()
+        {
+            var text = @"
+rule TestRule
+when
+    var fact = TestFact1();
+    
+then
+    var result = new ActionResult();
+    Context.Insert(result);
+";
+            Repository.LoadText(text);
+            Repository.Compile();
+        }
     }
 }
