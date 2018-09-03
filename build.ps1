@@ -13,20 +13,25 @@ $components = @{
     'NRules.RuleSharp' = @{
         name = 'NRules.RuleSharp'
         restore = @{
-            tool = 'nuget'
+            tool = 'dotnet'
         }
         build = @{
             tool = 'dotnet'
         }
         test = @{
             location = 'NRules.RuleSharp.IntegrationTests'
-            frameworks = @('net46')
+            frameworks = @('net462', 'netcoreapp2.0')
         }
         bin = @{
-            frameworks = @('net45')
+            frameworks = @('net45', 'netstandard2.0')
             'net45' = @{
                 include = @(
-                    "NRules.RuleSharp\bin\$configuration"
+                    "NRules.RuleSharp\bin\$configuration\net45"
+                )
+            }
+            'netstandard2.0' = @{
+                include = @(
+                    "NRules.RuleSharp\bin\$configuration\netstandard2.0"
                 )
             }
         }
