@@ -1,5 +1,5 @@
 ﻿using System;
-using Antlr4.Runtime.Tree;
+using System.Text;
 
 namespace NRules.RuleSharp
 {
@@ -9,20 +9,32 @@ namespace NRules.RuleSharp
     public class CompilationException : Exception
     {
         /// <summary>
-        /// Parse sub-tree associated with the exception.
+        /// Location in source where the compilation occurred.
         /// </summary>
-        internal IParseTree ParseTree { get; }
+        public SourceLocation Location { get; }
 
-        internal CompilationException(string message, IParseTree parseTree)
-            : base(message)
-        {
-            ParseTree = parseTree;
-        }
-
-        internal CompilationException(string message, IParseTree parseTree, Exception inner)
+        internal CompilationException(string message, SourceLocation source, Exception inner)
             : base(message, inner)
         {
-            ParseTree = parseTree;
+            Location = source;
+        }
+
+        /// <summary>
+        /// Message that describes the compilation exception.
+        /// </summary>
+        public override string Message
+        {
+            get
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine(base.Message);
+                if (!string.IsNullOrEmpty(Location.FileName))
+                    sb.AppendLine($"File={Location.FileName}");
+                sb.AppendLine($"Line={Location.LineNumber}");
+                sb.AppendLine($"Column={Location.ColumnNumber}");
+                sb.Append($"Source={Location.Text}");
+                return sb.ToString();
+            }
         }
     }
 }

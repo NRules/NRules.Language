@@ -17,6 +17,9 @@ namespace NRules.RuleSharp
         private readonly TypeMap _rootTypeMap;
         private readonly RuleSet _defaultRuleSet = new RuleSet("Default");
 
+        /// <summary>
+        /// Initializes a new instance of the <c>RuleRepository</c> class.
+        /// </summary>
         public RuleRepository()
         {
             _loader = new TypeLoader();
@@ -80,7 +83,15 @@ namespace NRules.RuleSharp
         {
             using (var inputStream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
             {
-                Load(inputStream);
+                try
+                {
+                    Load(inputStream);
+                }
+                catch (CompilationException ce)
+                {
+                    ce.Location.FileName = fileName;
+                    throw;
+                }
             }
         }
 
@@ -120,24 +131,24 @@ namespace NRules.RuleSharp
             var parserContext = new ParserContext(_loader, scopedTypeMap);
             var listener = new RuleSharpParserListener(parserContext, _defaultRuleSet);
 
-            var tree = ParseTree(input);
+            var lexer = new RuleSharpLexer(input);
+            var tokenStream = new CommonTokenStream(lexer);
             var walker = new ParseTreeWalker();
-            walker.Walk(listener, tree);
-        }
-
-        private static IParseTree ParseTree(AntlrInputStream inputStream)
-        {
             try
             {
-                var lexer = new RuleSharpLexer(inputStream);
-                var tokens = new CommonTokenStream(lexer);
-                var parser = new RuleSharpParser(tokens);
-                IParseTree tree = parser.compilation_unit();
-                return tree;
+                var parser = new RuleSharpParser(tokenStream);
+                var tree = parser.compilation_unit();
+                walker.Walk(listener, tree);
             }
-            catch (RecognitionException e)
+            catch (RecognitionException re)
             {
-                throw new CompilationException("Failed to compile rules", e.Context, e);
+                var location = tokenStream.GetSourceLocation(re.Context);
+                throw new CompilationException("Failed to compile rules", location, re);
+            }
+            catch (ParseException pe)
+            {
+                var location = tokenStream.GetSourceLocation(pe.Context);
+                throw new CompilationException(pe.Message, location, pe.InnerException);
             }
         }
     }

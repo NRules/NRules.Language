@@ -47,7 +47,7 @@ namespace NRules.RuleSharp
                 var value = Double.Parse(literal.Symbol.Text);
                 return Expression.Constant(value, typeof(double));
             }
-            throw new CompilationException("Unsupported literal", context);
+            throw new ParseException("Unsupported literal", context);
         }
     }
 }

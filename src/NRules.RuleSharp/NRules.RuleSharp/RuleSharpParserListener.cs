@@ -48,7 +48,7 @@ namespace NRules.RuleSharp
 
         public override void EnterType_declaration(Type_declarationContext context)
         {
-            throw new CompilationException("Unsupported expression. ExpressionType=type declaration", context);
+            throw new ParseException("Unsupported expression. ExpressionType=type declaration", context);
         }
     }
 }
