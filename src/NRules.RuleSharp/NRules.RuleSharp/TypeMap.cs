@@ -31,14 +31,6 @@ namespace NRules.RuleSharp
             _aliases[alias] = typeName;
         }
 
-        public Type GetType(string typeName)
-        {
-            var type = FindType(typeName);
-            if (type != null) return type;
-
-            throw new ArgumentException($"Unknown type. Type={typeName}");
-        }
-
         public Type FindType(string typeName)
         {
             Type type = FindTypeByAlias(typeName);

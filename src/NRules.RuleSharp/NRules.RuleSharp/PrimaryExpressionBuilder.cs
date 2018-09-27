@@ -57,7 +57,10 @@ namespace NRules.RuleSharp
 
         public void TypeName(string typeName)
         {
-            _type = _parserContext.GetType(typeName);
+            _type = _parserContext.FindType(typeName);
+            if (_type == null)
+                throw new ParseException($"Unknown type. Type={typeName}", _context);
+
             _name = null;
         }
 

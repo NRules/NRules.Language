@@ -265,7 +265,10 @@ namespace NRules.RuleSharp
             var expression = Visit(context.unary_expression());
             if (context.type() != null)
             {
-                var type = _parserContext.GetType(context.type().GetText());
+                var typeName = context.type().GetText();
+                var type = _parserContext.FindType(typeName);
+                if (type == null)
+                    throw new ParseException($"Unknown type. Type={typeName}", context);
                 return Expression.Convert(expression, type);
             }
 
