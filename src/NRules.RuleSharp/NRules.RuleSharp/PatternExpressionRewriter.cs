@@ -7,20 +7,18 @@ namespace NRules.RuleSharp
 {
     internal class PatternExpressionRewriter : ExpressionRewriter
     {
-        private readonly Declaration _patternDeclaration;
         private ParameterExpression _originalParameter;
-        private ParameterExpression _normalizedParameter;
+        private readonly ParameterExpression _normalizedParameter;
 
-        public PatternExpressionRewriter(Declaration patternDeclaration, IEnumerable<Declaration> declarations)
+        public PatternExpressionRewriter(Declaration patternDeclaration, IEnumerable<ParameterExpression> declarations)
             : base(declarations)
         {
-            _patternDeclaration = patternDeclaration;
+            _normalizedParameter = patternDeclaration.ToParameterExpression();
         }
 
         protected override void InitParameters(LambdaExpression expression)
         {
             _originalParameter = expression.Parameters.Single();
-            _normalizedParameter = _patternDeclaration.ToParameterExpression();
             Parameters.Add(_normalizedParameter);
         }
 

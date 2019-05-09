@@ -1,16 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using NRules.RuleModel;
 
 namespace NRules.RuleSharp
 {
     internal class ExpressionRewriter : ExpressionVisitor
     {
-        private IDictionary<string, Declaration> Declarations { get; }
+        private IDictionary<string, ParameterExpression> Declarations { get; }
         protected List<ParameterExpression> Parameters { get; }
 
-        public ExpressionRewriter(IEnumerable<Declaration> declarations)
+        public ExpressionRewriter(IEnumerable<ParameterExpression> declarations)
         {
             Declarations = declarations.ToDictionary(d => d.Name);
             Parameters = new List<ParameterExpression>();

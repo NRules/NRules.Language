@@ -66,8 +66,6 @@ namespace NRules.RuleSharp
                 throw new ParseException($"Unknown type. Type={variableTypeName}", context);
 
             var id = context.identifier().GetText();
-            _parserContext.Scope.Declare(variableType, id);
-
             var patternBuilder = _groupBuilder.Pattern(patternType, id);
             if (context.expression_list() != null)
             {
@@ -77,10 +75,11 @@ namespace NRules.RuleSharp
                     {
                         var expressionParser = new ExpressionParser(_parserContext, patternType);
                         var expression = (LambdaExpression) expressionParser.Visit(expressionContext);
-                        patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
+                        patternBuilder.DslConditions(_parserContext.Scope.Declarations, expression);
                     }
                 }
             }
+            _parserContext.Scope.Declare(variableType, id);
         }
 
         public override void EnterRuleExistsMatch(RuleExistsMatchContext context)
@@ -100,7 +99,7 @@ namespace NRules.RuleSharp
                     {
                         var expressionParser = new ExpressionParser(_parserContext, patternType);
                         var expression = (LambdaExpression) expressionParser.Visit(expressionContext);
-                        patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
+                        patternBuilder.DslConditions(_parserContext.Scope.Declarations, expression);
                     }
                 }
             }
@@ -123,7 +122,7 @@ namespace NRules.RuleSharp
                     {
                         var expressionParser = new ExpressionParser(_parserContext, patternType);
                         var expression = (LambdaExpression) expressionParser.Visit(expressionContext);
-                        patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
+                        patternBuilder.DslConditions(_parserContext.Scope.Declarations, expression);
                     }
                 }
             }
@@ -133,16 +132,25 @@ namespace NRules.RuleSharp
         {
             var contextParameter = Expression.Parameter(typeof(IContext), "Context");
             var parameters = new List<ParameterExpression>{contextParameter};
-            parameters.AddRange(_parserContext.Scope.Values);
+            parameters.AddRange(_parserContext.Scope.Declarations);
 
             using (_parserContext.PushScope())
             {
                 _parserContext.Scope.Declare(contextParameter);
 
+                var lambda = ParseActionExpression(context, parameters);
+                _actionGroupBuilder.DslAction(_parserContext.Scope.Declarations, lambda);
+            }
+        }
+
+        private LambdaExpression ParseActionExpression(Rule_actionContext context, IEnumerable<ParameterExpression> parameters)
+        {
+            using (_parserContext.PushScope())
+            {
                 var expressionParser = new ExpressionParser(_parserContext);
                 var block = expressionParser.Visit(context.statement_list());
                 var lambda = Expression.Lambda(block, parameters);
-                _actionGroupBuilder.DslAction(_actionGroupBuilder.Declarations, lambda);
+                return lambda;
             }
         }
     }

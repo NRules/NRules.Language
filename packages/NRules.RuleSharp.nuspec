@@ -17,11 +17,11 @@
     <tags>nrules business rules language dsl</tags>
     <dependencies>
       <group targetFramework="net45">
-        <dependency id="NRules.RuleModel" version="0.8.4" />
+        <dependency id="NRules.RuleModel" version="0.9.0" />
         <dependency id="Antlr4.Runtime" version="4.6.5" />
       </group>
       <group targetFramework="netstandard2.0">
-        <dependency id="NRules.RuleModel" version="0.8.4" />
+        <dependency id="NRules.RuleModel" version="0.9.0" />
         <dependency id="Antlr4.Runtime" version="4.6.5" />
       </group>
     </dependencies>
