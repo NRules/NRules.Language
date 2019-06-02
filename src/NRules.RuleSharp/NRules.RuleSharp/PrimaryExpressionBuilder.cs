@@ -23,6 +23,9 @@ namespace NRules.RuleSharp
 
         public Expression GetExpression()
         {
+            if (!string.IsNullOrEmpty(_name))
+                throw new InternalParseException($"Unknown identifier. Identifier={_name}", _context);
+
             return _expression;
         }
 
@@ -57,7 +60,10 @@ namespace NRules.RuleSharp
 
         public void TypeName(string typeName)
         {
-            _type = _parserContext.GetType(typeName);
+            _type = _parserContext.FindType(typeName);
+            if (_type == null)
+                throw new InternalParseException($"Unknown type. Type={typeName}", _context);
+
             _name = null;
         }
 
@@ -105,7 +111,7 @@ namespace NRules.RuleSharp
                 return;
             }
 
-            throw new CompilationException($"Type member not found. Type={type}, Member={name}", _context);
+            throw new InternalParseException($"Type member not found. Type={type}, Member={name}", _context);
         }
 
         public NewExpression Constructor(List<Expression> argumentsList)
@@ -115,7 +121,7 @@ namespace NRules.RuleSharp
             if (ci == null)
             {
                 var argString = string.Join(",", argumentTypes.Cast<Type>());
-                throw new CompilationException($"Constructor not found. Type={_type}, Arguments={argString}", _context);
+                throw new InternalParseException($"Constructor not found. Type={_type}, Arguments={argString}", _context);
             }
             var arguments = EnsureArgumentTypes(argumentsList, ci);
             var newExpression = Expression.New(ci, arguments);
@@ -127,7 +133,7 @@ namespace NRules.RuleSharp
         {
             if (_type == null)
             {
-                throw new CompilationException($"Binding a value requires a type. Name={name}", _context);
+                throw new InternalParseException($"Binding a value requires a type. Name={name}", _context);
             }
             
             MemberInfo member = _type.GetProperty(name);
@@ -138,7 +144,7 @@ namespace NRules.RuleSharp
 
             if (member == null)
             {
-                throw new CompilationException($"Type member not found. Type={_type}, Member={name}", _context);
+                throw new InternalParseException($"Type member not found. Type={_type}, Member={name}", _context);
             }
 
             var binding = Expression.Bind(member, expression);
@@ -162,9 +168,13 @@ namespace NRules.RuleSharp
             {
                 Method(_name, _type, null, argumentsList);
             }
+            else if (_name != null)
+            {
+                throw new InternalParseException($"Unknown identifier. Identifier={_name}", _context);
+            }
             else
             {
-                throw new CompilationException("Unexpected method call", _context);
+                throw new InternalParseException("Unexpected method call", _context);
             }
         }
 
@@ -185,7 +195,7 @@ namespace NRules.RuleSharp
             if (mi == null)
             {
                 var argString = string.Join(",", argumentTypes.Cast<Type>());
-                throw new CompilationException($"Method not found. Type={type}, Method={methodName}, Arguments={argString}", _context);
+                throw new InternalParseException($"Method not found. Type={type}, Method={methodName}, Arguments={argString}", _context);
             }
             var arguments = EnsureArgumentTypes(argumentsList, mi);
             SetExpression(Expression.Call(instance, mi, arguments));
@@ -194,7 +204,7 @@ namespace NRules.RuleSharp
         public void Index(List<Expression> indexList)
         {
             if (_expression == null)
-                throw new CompilationException("No expression to apply indexer", _context);
+                throw new InternalParseException("No expression to apply indexer", _context);
 
             var expressionType = _expression.Type;
             if (expressionType.IsArray)
@@ -206,7 +216,7 @@ namespace NRules.RuleSharp
                 var indexer = expressionType.GetProperties()
                     .SingleOrDefault(pi => pi.GetIndexParameters().Any());
                 if (indexer == null)
-                    throw new CompilationException($"Type does not have indexer property. Type={expressionType}", _context);
+                    throw new InternalParseException($"Type does not have indexer property. Type={expressionType}", _context);
 
                 _expression = Expression.MakeIndex(_expression, indexer, indexList);
             }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace NRules.RuleSharp
@@ -40,9 +41,6 @@ namespace NRules.RuleSharp
             return _parentScope?.Lookup(name);
         }
 
-        public IEnumerable<ParameterExpression> Values
-        {
-            get { return _scope.Values; }
-        }
+        public IEnumerable<ParameterExpression> Declarations => _parentScope?.Declarations.Union(_scope.Values) ?? _scope.Values;
     }
 }

@@ -3,7 +3,7 @@ param (
     [string]$component = 'Core'
 )
 
-$version = '0.0.4'
+$version = '0.0.5'
 $configuration = 'Release'
 
 if (Test-Path Env:CI) { $version = $Env:APPVEYOR_BUILD_VERSION }
@@ -20,7 +20,7 @@ $components = @{
         }
         test = @{
             location = 'NRules.RuleSharp.IntegrationTests'
-            frameworks = @('net462', 'netcoreapp2.0')
+            frameworks = @('net472', 'netcoreapp2.0')
         }
         bin = @{
             frameworks = @('net45', 'netstandard2.0')

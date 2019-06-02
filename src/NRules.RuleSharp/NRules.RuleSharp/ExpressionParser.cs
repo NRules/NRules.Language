@@ -108,8 +108,9 @@ namespace NRules.RuleSharp
         public override Expression VisitPrimary_expression(Primary_expressionContext context)
         {
             var builder = new PrimaryExpressionBuilder(_parserContext);
+            builder.Context(context);
+
             var pe = context.pe;
-            builder.Context(pe);
             if (pe is LiteralExpressionContext l)
             {
                 var literalParser = new LiteralParser();
@@ -118,7 +119,7 @@ namespace NRules.RuleSharp
             }
             else if (pe is LiteralAccessExpressionContext)
             {
-                throw new CompilationException("Unsupported expression. ExpressionType=literal access", context);
+                throw new InternalParseException("Unsupported expression. ExpressionType=literal access", context);
             }
             else if (pe is SimpleNameExpressionContext sn)
             {
@@ -130,7 +131,7 @@ namespace NRules.RuleSharp
                 else
                 {
                     if (sn.type_argument_list() != null)
-                        throw new CompilationException("Unsupported expression. ExpressionType=type arguments", context);
+                        throw new InternalParseException("Unsupported expression. ExpressionType=type arguments", context);
 
                     builder.NamePart(sn.GetText());
                 }
@@ -163,7 +164,7 @@ namespace NRules.RuleSharp
                 }
                 else
                 {
-                    throw new CompilationException("Unsupported expression. ExpressionType=object creation", context);
+                    throw new InternalParseException("Unsupported expression. ExpressionType=object creation", context);
                 }
             }
             else if (pe is MemberAccessExpressionContext pt)
@@ -172,43 +173,43 @@ namespace NRules.RuleSharp
             }
             else if (pe is ThisReferenceExpressionContext)
             {
-                throw new CompilationException("Unsupported expression. ExpressionType=this reference", context);
+                throw new InternalParseException("Unsupported expression. ExpressionType=this reference", context);
             }
             else if (pe is BaseAccessExpressionContext)
             {
-                throw new CompilationException("Unsupported expression. ExpressionType=base access", context);
+                throw new InternalParseException("Unsupported expression. ExpressionType=base access", context);
             }
             else if (pe is TypeofExpressionContext)
             {
-                throw new CompilationException("Unsupported expression. ExpressionType=typeof", context);
+                throw new InternalParseException("Unsupported expression. ExpressionType=typeof", context);
             }
             else if (pe is SizeofExpressionContext)
             {
-                throw new CompilationException("Unsupported expression. ExpressionType=sizeof", context);
+                throw new InternalParseException("Unsupported expression. ExpressionType=sizeof", context);
             }
             else if (pe is NameofExpressionContext)
             {
-                throw new CompilationException("Unsupported expression. ExpressionType=nameof", context);
+                throw new InternalParseException("Unsupported expression. ExpressionType=nameof", context);
             }
             else if (pe is CheckedExpressionContext)
             {
-                throw new CompilationException("Unsupported expression. ExpressionType=checked", context);
+                throw new InternalParseException("Unsupported expression. ExpressionType=checked", context);
             }
             else if (pe is UncheckedExpressionContext)
             {
-                throw new CompilationException("Unsupported expression. ExpressionType=unchecked", context);
+                throw new InternalParseException("Unsupported expression. ExpressionType=unchecked", context);
             }
             else if (pe is DefaultValueExpressionContext)
             {
-                throw new CompilationException("Unsupported expression. ExpressionType=default", context);
+                throw new InternalParseException("Unsupported expression. ExpressionType=default", context);
             }
             else if (pe is AnonymousMethodExpressionContext)
             {
-                throw new CompilationException("Unsupported expression. ExpressionType=anonymous method", context);
+                throw new InternalParseException("Unsupported expression. ExpressionType=anonymous method", context);
             }
             else
             {
-                throw new CompilationException("Unsupported expression", context);
+                throw new InternalParseException("Unsupported expression", context);
             }
 
             foreach (var child in context.children.Skip(1))
@@ -237,11 +238,11 @@ namespace NRules.RuleSharp
                 else if (child is ITerminalNode tn)
                 {
                     var op = tn.Symbol.Text; //++, --
-                    throw new CompilationException($"Unsupported operation. Operation={op}", context);
+                    throw new InternalParseException($"Unsupported operation. Operation={op}", context);
                 }
                 else
                 {
-                    throw new CompilationException("Unsupported expression", context);
+                    throw new InternalParseException("Unsupported expression", context);
                 }
             }
 
@@ -251,7 +252,7 @@ namespace NRules.RuleSharp
 
         public override Expression VisitQuery_expression(Query_expressionContext context)
         {
-            throw new CompilationException("Unsupported expression. ExpressionType=query expression", context);
+            throw new InternalParseException("Unsupported expression. ExpressionType=query expression", context);
         }
 
         public override Expression VisitUnary_expression(Unary_expressionContext context)
@@ -264,7 +265,10 @@ namespace NRules.RuleSharp
             var expression = Visit(context.unary_expression());
             if (context.type() != null)
             {
-                var type = _parserContext.GetType(context.type().GetText());
+                var typeName = context.type().GetText();
+                var type = _parserContext.FindType(typeName);
+                if (type == null)
+                    throw new InternalParseException($"Unknown type. Type={typeName}", context);
                 return Expression.Convert(expression, type);
             }
 
@@ -283,7 +287,7 @@ namespace NRules.RuleSharp
             }
             else
             {
-                throw new CompilationException($"Unsupported operation. Operation={op}", context);
+                throw new InternalParseException($"Unsupported operation. Operation={op}", context);
             }
             return expression;
         }
@@ -302,22 +306,22 @@ namespace NRules.RuleSharp
 
         public override Expression VisitWhileStatement(WhileStatementContext context)
         {
-            throw new CompilationException("Unsupported statement. StatementType=while loop", context);
+            throw new InternalParseException("Unsupported statement. StatementType=while loop", context);
         }
 
         public override Expression VisitDoStatement(DoStatementContext context)
         {
-            throw new CompilationException("Unsupported statement. StatementType=do loop", context);
+            throw new InternalParseException("Unsupported statement. StatementType=do loop", context);
         }
 
         public override Expression VisitForStatement(ForStatementContext context)
         {
-            throw new CompilationException("Unsupported statement. StatementType=for loop", context);
+            throw new InternalParseException("Unsupported statement. StatementType=for loop", context);
         }
 
         public override Expression VisitForeachStatement(ForeachStatementContext context)
         {
-            throw new CompilationException("Unsupported statement. StatementType=foreach loop", context);
+            throw new InternalParseException("Unsupported statement. StatementType=foreach loop", context);
         }
 
         public override Expression VisitConditional_expression(Conditional_expressionContext context)
@@ -368,7 +372,7 @@ namespace NRules.RuleSharp
                 }
                 else
                 {
-                    throw new CompilationException($"Unsupported operation. Operation={op}", context);
+                    throw new InternalParseException($"Unsupported operation. Operation={op}", context);
                 }
             }
             return expression;
@@ -446,7 +450,7 @@ namespace NRules.RuleSharp
                 }
                 else
                 {
-                    throw new CompilationException($"Unsupported operation. Operation={op}", context);
+                    throw new InternalParseException($"Unsupported operation. Operation={op}", context);
                 }
             }
             return expression;
@@ -473,7 +477,7 @@ namespace NRules.RuleSharp
                 }
                 else
                 {
-                    throw new CompilationException($"Unsupported operation. Operation={op}", context);
+                    throw new InternalParseException($"Unsupported operation. Operation={op}", context);
                 }
             }
             return expression;
@@ -501,7 +505,7 @@ namespace NRules.RuleSharp
                 }
                 else
                 {
-                    throw new CompilationException($"Unsupported operation. Operation={op}", context);
+                    throw new InternalParseException($"Unsupported operation. Operation={op}", context);
                 }
             }
             return expression;
@@ -558,7 +562,7 @@ namespace NRules.RuleSharp
                 return Expression.RightShiftAssign(unaryExpression, expression);
             }
 
-            throw new CompilationException($"Unsupported operation. Operation={op}", context);
+            throw new InternalParseException($"Unsupported operation. Operation={op}", context);
         }
 
         public override Expression VisitLiteral(LiteralContext context)

@@ -54,16 +54,18 @@ namespace NRules.RuleSharp
         public override void EnterRuleFactMatch(RuleFactMatchContext context)
         {
             var patternTypeName = context.type().GetText();
-            var patternType = _parserContext.GetType(patternTypeName);
+            var patternType = _parserContext.FindType(patternTypeName);
+            if (patternType == null)
+                throw new InternalParseException($"Unknown type. Type={patternTypeName}", context);
 
             var variableTypeName = context.local_variable_type().VAR() == null
                 ? context.local_variable_type().type().GetText()
                 : patternTypeName;
-            var variableType = _parserContext.GetType(variableTypeName);
+            var variableType = _parserContext.FindType(variableTypeName);
+            if (variableType == null)
+                throw new InternalParseException($"Unknown type. Type={variableTypeName}", context);
 
             var id = context.identifier().GetText();
-            _parserContext.Scope.Declare(variableType, id);
-
             var patternBuilder = _groupBuilder.Pattern(patternType, id);
             if (context.expression_list() != null)
             {
@@ -73,16 +75,19 @@ namespace NRules.RuleSharp
                     {
                         var expressionParser = new ExpressionParser(_parserContext, patternType);
                         var expression = (LambdaExpression) expressionParser.Visit(expressionContext);
-                        patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
+                        patternBuilder.DslConditions(_parserContext.Scope.Declarations, expression);
                     }
                 }
             }
+            _parserContext.Scope.Declare(variableType, id);
         }
 
         public override void EnterRuleExistsMatch(RuleExistsMatchContext context)
         {
             var patternTypeName = context.type().GetText();
-            var patternType = _parserContext.GetType(patternTypeName);
+            var patternType = _parserContext.FindType(patternTypeName);
+            if (patternType == null)
+                throw new InternalParseException($"Unknown type. Type={patternTypeName}", context);
 
             var existsBuilder = _groupBuilder.Exists();
             var patternBuilder = existsBuilder.Pattern(patternType);
@@ -94,7 +99,7 @@ namespace NRules.RuleSharp
                     {
                         var expressionParser = new ExpressionParser(_parserContext, patternType);
                         var expression = (LambdaExpression) expressionParser.Visit(expressionContext);
-                        patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
+                        patternBuilder.DslConditions(_parserContext.Scope.Declarations, expression);
                     }
                 }
             }
@@ -103,7 +108,9 @@ namespace NRules.RuleSharp
         public override void EnterRuleNotMatch(RuleNotMatchContext context)
         {
             var patternTypeName = context.type().GetText();
-            var patternType = _parserContext.GetType(patternTypeName);
+            var patternType = _parserContext.FindType(patternTypeName);
+            if (patternType == null)
+                throw new InternalParseException($"Unknown type. Type={patternTypeName}", context);
 
             var existsBuilder = _groupBuilder.Not();
             var patternBuilder = existsBuilder.Pattern(patternType);
@@ -115,7 +122,7 @@ namespace NRules.RuleSharp
                     {
                         var expressionParser = new ExpressionParser(_parserContext, patternType);
                         var expression = (LambdaExpression) expressionParser.Visit(expressionContext);
-                        patternBuilder.DslConditions(_groupBuilder.Declarations, expression);
+                        patternBuilder.DslConditions(_parserContext.Scope.Declarations, expression);
                     }
                 }
             }
@@ -125,16 +132,25 @@ namespace NRules.RuleSharp
         {
             var contextParameter = Expression.Parameter(typeof(IContext), "Context");
             var parameters = new List<ParameterExpression>{contextParameter};
-            parameters.AddRange(_parserContext.Scope.Values);
+            parameters.AddRange(_parserContext.Scope.Declarations);
 
             using (_parserContext.PushScope())
             {
                 _parserContext.Scope.Declare(contextParameter);
 
+                var lambda = ParseActionExpression(context, parameters);
+                _actionGroupBuilder.DslAction(_parserContext.Scope.Declarations, lambda);
+            }
+        }
+
+        private LambdaExpression ParseActionExpression(Rule_actionContext context, IEnumerable<ParameterExpression> parameters)
+        {
+            using (_parserContext.PushScope())
+            {
                 var expressionParser = new ExpressionParser(_parserContext);
                 var block = expressionParser.Visit(context.statement_list());
                 var lambda = Expression.Lambda(block, parameters);
-                _actionGroupBuilder.DslAction(_actionGroupBuilder.Declarations, lambda);
+                return lambda;
             }
         }
     }

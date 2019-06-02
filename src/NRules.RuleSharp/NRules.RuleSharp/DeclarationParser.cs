@@ -28,11 +28,11 @@ namespace NRules.RuleSharp
                     var initializer = expressionParser.Visit(declaratorContext.local_variable_initializer());
 
                     var parameter = Expression.Variable(initializer.Type, declaratorContext.identifier().GetText());
-                    _parserContext.Scope.Declare(parameter);
-                    declarations.Add(parameter);
-
                     var expression = Expression.Assign(parameter, initializer);
+
+                    declarations.Add(parameter);
                     statements.Add(expression);
+                    _parserContext.Scope.Declare(parameter);
                 }
             }
 

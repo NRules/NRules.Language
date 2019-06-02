@@ -48,11 +48,6 @@ namespace NRules.RuleSharp
             return _typeMap.FindType(typeName);
         }
 
-        internal Type GetType(string typeName)
-        {
-            return _typeMap.GetType(typeName);
-        }
-
         public MethodInfo FindExtensionMethod(Type type, string methodName, Type[] argumentTypes)
         {
             var binder = Type.DefaultBinder;

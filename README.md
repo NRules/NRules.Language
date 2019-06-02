@@ -85,4 +85,4 @@ session.Fire();
 ```
 
 ---
-Copyright &copy; 2012-2018 [Sergiy Nikolayev](https://github.com/snikolayev) under the [MIT license](LICENSE.txt).
+Copyright &copy; 2012-2019 [Sergiy Nikolayev](https://github.com/snikolayev) under the [MIT license](LICENSE.txt).
