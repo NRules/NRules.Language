@@ -4,23 +4,23 @@ using System.Text;
 namespace NRules.RuleSharp
 {
     /// <summary>
-    /// Exception that encapsulates a rules compilation error.
+    /// Exception that is thrown when parsing of rules fails.
     /// </summary>
-    public class CompilationException : Exception
+    public class RulesParseException : Exception
     {
         /// <summary>
-        /// Location in source where the compilation occurred.
+        /// Location in source where the error was detected.
         /// </summary>
         public SourceLocation Location { get; }
 
-        internal CompilationException(string message, SourceLocation source, Exception inner)
+        internal RulesParseException(string message, SourceLocation source, Exception inner)
             : base(message, inner)
         {
             Location = source;
         }
 
         /// <summary>
-        /// Message that describes the compilation exception.
+        /// Message that describes the parsing error.
         /// </summary>
         public override string Message
         {

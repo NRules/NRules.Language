@@ -56,14 +56,14 @@ namespace NRules.RuleSharp
             var patternTypeName = context.type().GetText();
             var patternType = _parserContext.FindType(patternTypeName);
             if (patternType == null)
-                throw new ParseException($"Unknown type. Type={patternTypeName}", context);
+                throw new InternalParseException($"Unknown type. Type={patternTypeName}", context);
 
             var variableTypeName = context.local_variable_type().VAR() == null
                 ? context.local_variable_type().type().GetText()
                 : patternTypeName;
             var variableType = _parserContext.FindType(variableTypeName);
             if (variableType == null)
-                throw new ParseException($"Unknown type. Type={variableTypeName}", context);
+                throw new InternalParseException($"Unknown type. Type={variableTypeName}", context);
 
             var id = context.identifier().GetText();
             var patternBuilder = _groupBuilder.Pattern(patternType, id);
@@ -87,7 +87,7 @@ namespace NRules.RuleSharp
             var patternTypeName = context.type().GetText();
             var patternType = _parserContext.FindType(patternTypeName);
             if (patternType == null)
-                throw new ParseException($"Unknown type. Type={patternTypeName}", context);
+                throw new InternalParseException($"Unknown type. Type={patternTypeName}", context);
 
             var existsBuilder = _groupBuilder.Exists();
             var patternBuilder = existsBuilder.Pattern(patternType);
@@ -110,7 +110,7 @@ namespace NRules.RuleSharp
             var patternTypeName = context.type().GetText();
             var patternType = _parserContext.FindType(patternTypeName);
             if (patternType == null)
-                throw new ParseException($"Unknown type. Type={patternTypeName}", context);
+                throw new InternalParseException($"Unknown type. Type={patternTypeName}", context);
 
             var existsBuilder = _groupBuilder.Not();
             var patternBuilder = existsBuilder.Pattern(patternType);
