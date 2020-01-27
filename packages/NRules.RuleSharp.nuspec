@@ -13,7 +13,7 @@
     <summary>Business rules language for the NRules rules engine.</summary>
     <description>NRules is an open source rules engine for .NET that is based on the Rete matching algorithm. Rule# (Rule Sharp) is a business rules language for the NRules rules engine.</description>
     <releaseNotes>https://github.com/NRules/NRules.Language/releases/v$version$</releaseNotes>
-    <copyright>Copyright 2012-2019 Sergiy Nikolayev. All rights reserved.</copyright>
+    <copyright>Copyright 2012-2020 Sergiy Nikolayev. All rights reserved.</copyright>
     <tags>nrules business rules language dsl</tags>
     <dependencies>
       <group targetFramework="net45">
