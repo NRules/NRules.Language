@@ -67,6 +67,7 @@ The following code will compile the ```Discount.rul```, insert facts into the ru
 ```c#
 var repository = new RuleRepository();
 repository.AddNamespace("System");
+repository.AddReference(typeof(Console).Assembly);
 repository.AddReference(typeof(Order).Assembly);
 
 repository.Load(@"Discount.rul");
