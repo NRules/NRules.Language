@@ -20,7 +20,7 @@ $components = @{
         }
         test = @{
             location = 'NRules.RuleSharp.IntegrationTests'
-            frameworks = @('net472', 'netcoreapp2.0')
+            frameworks = @('net48', 'netcoreapp3.1')
         }
         bin = @{
             frameworks = @('net45', 'netstandard2.0')
