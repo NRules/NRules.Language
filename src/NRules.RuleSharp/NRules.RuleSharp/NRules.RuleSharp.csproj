@@ -10,8 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Antlr4.CodeGenerator" Version="4.6.5" PrivateAssets="All" />
-    <PackageReference Include="Antlr4.Runtime" Version="4.6.5" />
+    <PackageReference Include="Antlr4.CodeGenerator" Version="4.6.6" PrivateAssets="All" />
+    <PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
     <PackageReference Include="NRules.RuleModel" Version="0.9.1" />
   </ItemGroup>
 
