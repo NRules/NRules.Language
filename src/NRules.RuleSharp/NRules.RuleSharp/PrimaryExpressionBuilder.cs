@@ -16,9 +16,10 @@ namespace NRules.RuleSharp
         private Type _type;
         private string _name;
 
-        public PrimaryExpressionBuilder(ParserContext parserContext)
+        public PrimaryExpressionBuilder(ParserContext parserContext, IParseTree context)
         {
             _parserContext = parserContext;
+            SetContext(context);
         }
 
         public Expression GetExpression()
@@ -27,11 +28,6 @@ namespace NRules.RuleSharp
                 throw new InternalParseException($"Unknown identifier. Identifier={_name}", _context);
 
             return _expression;
-        }
-
-        public void Context(IParseTree context)
-        {
-            _context = context;
         }
 
         public void ExpressionStart(Expression expression)
@@ -67,14 +63,16 @@ namespace NRules.RuleSharp
             _name = null;
         }
 
-        public void Member(string name)
+        public void Member(string name, IParseTree context)
         {
             if (_expression != null)
             {
+                SetContext(context);
                 Member(name, _expression.Type, _expression);
             }
             else if (_type != null)
             {
+                SetContext(context);
                 Member(name, _type, null);
             }
             else
@@ -181,16 +179,25 @@ namespace NRules.RuleSharp
         private void Method(string methodName, Type type, Expression instance, List<Expression> argumentsList)
         {
             var argumentTypes = argumentsList.Select(x => x.Type).ToArray();
-            var mi = type.GetMethod(methodName, argumentTypes);
-            if (mi == null && instance != null)
+            MethodInfo mi;
+            try
             {
-                mi = _parserContext.FindExtensionMethod(type, methodName, argumentTypes);
-                if (mi != null)
+                mi = type.GetMethod(methodName, argumentTypes);
+                if (mi == null && instance != null)
                 {
-                    //In extension method instance is passed as the first argument
-                    argumentsList.Insert(0, instance);
-                    instance = null;
+                    mi = _parserContext.FindExtensionMethod(type, methodName, argumentTypes);
+                    if (mi != null)
+                    {
+                        //In extension method instance is passed as the first argument
+                        argumentsList.Insert(0, instance);
+                        instance = null;
+                    }
                 }
+            }
+            catch (AmbiguousMatchException)
+            {
+                var argString = string.Join(",", argumentTypes.Cast<Type>());
+                throw new InternalParseException($"Ambiguous method name. Type={type}, Method={methodName}, Arguments={argString}", _context);
             }
             if (mi == null)
             {
@@ -221,14 +228,7 @@ namespace NRules.RuleSharp
                 _expression = Expression.MakeIndex(_expression, indexer, indexList);
             }
         }
-
-        private void SetExpression(Expression expression)
-        {
-            _expression = expression;
-            _type = null;
-            _name = null;
-        }
-
+        
         private static IEnumerable<Expression> EnsureArgumentTypes(List<Expression> argumentsList, MethodBase mb)
         {
             var methodArguments = mb.GetParameters();
@@ -243,6 +243,18 @@ namespace NRules.RuleSharp
                     yield return argumentsList[i];
                 }
             }
+        }
+        
+        private void SetExpression(Expression expression)
+        {
+            _expression = expression;
+            _type = null;
+            _name = null;
+        }
+
+        private void SetContext(IParseTree context)
+        {
+            _context = context;
         }
     }
 }

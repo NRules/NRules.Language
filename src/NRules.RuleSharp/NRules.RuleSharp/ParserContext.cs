@@ -55,6 +55,8 @@ namespace NRules.RuleSharp
                 throw new InvalidOperationException("Default type binder cannot be found");
 
             var methodCandidates = GetExtensionMethods(type, methodName).Cast<MethodBase>().ToArray();
+            if (!methodCandidates.Any()) return null;
+            
             argumentTypes = Enumerable.Repeat(type, 1).Concat(argumentTypes).ToArray();
             var mi = binder.SelectMethod(BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod, methodCandidates, argumentTypes, null) as MethodInfo;
             return mi;

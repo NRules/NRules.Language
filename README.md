@@ -67,6 +67,7 @@ The following code will compile the ```Discount.rul```, insert facts into the ru
 ```c#
 var repository = new RuleRepository();
 repository.AddNamespace("System");
+repository.AddReference(typeof(Console).Assembly);
 repository.AddReference(typeof(Order).Assembly);
 
 repository.Load(@"Discount.rul");
@@ -85,4 +86,4 @@ session.Fire();
 ```
 
 ---
-Copyright &copy; 2012-2019 [Sergiy Nikolayev](https://github.com/snikolayev) under the [MIT license](LICENSE.txt).
+Copyright &copy; 2012-2020 [Sergiy Nikolayev](https://github.com/snikolayev) under the [MIT license](LICENSE.txt).

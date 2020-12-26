@@ -1,4 +1,4 @@
-//Derived from https://github.com/antlr/grammars-v4/csharp
+//Derived from https://github.com/antlr/grammars-v4/tree/master/csharp
 //License: Eclipse Public License - v 1.0 (http://www.eclipse.org/legal/epl-v10.html)
 
 lexer grammar RuleSharpLexer;
@@ -117,6 +117,7 @@ TYPEOF:        'typeof';
 UINT:          'uint';
 ULONG:         'ulong';
 UNCHECKED:     'unchecked';
+UNMANAGED:     'unmanaged';
 UNSAFE:        'unsafe';
 USHORT:        'ushort';
 USING:         'using';
@@ -145,10 +146,11 @@ IDENTIFIER:          '@'? IdentifierOrKeyword;
 
 //B.1.8 Literals
 // 0.Equals() would be parsed as an invalid real (1. branch) causing a lexer error
-LITERAL_ACCESS:      [0-9]+ IntegerTypeSuffix? '.' '@'? IdentifierOrKeyword;
-INTEGER_LITERAL:     [0-9]+ IntegerTypeSuffix?;
-HEX_INTEGER_LITERAL: '0' [xX] HexDigit+ IntegerTypeSuffix?;
-REAL_LITERAL:        [0-9]* '.' [0-9]+ ExponentPart? [FfDdMm]? | [0-9]+ ([FfDdMm] | ExponentPart [FfDdMm]?);
+LITERAL_ACCESS:      [0-9] ('_'* [0-9])* IntegerTypeSuffix? '.' '@'? IdentifierOrKeyword;
+INTEGER_LITERAL:     [0-9] ('_'* [0-9])* IntegerTypeSuffix?;
+HEX_INTEGER_LITERAL: '0' [xX] ('_'* HexDigit)+ IntegerTypeSuffix?;
+BIN_INTEGER_LITERAL: '0' [bB] ('_'* [01])+ IntegerTypeSuffix?;
+REAL_LITERAL:        ([0-9] ('_'* [0-9])*)? '.' [0-9] ('_'* [0-9])* ExponentPart? [FfDdMm]? | [0-9] ('_'* [0-9])* ([FfDdMm] | ExponentPart [FfDdMm]?);
 
 CHARACTER_LITERAL:                   '\'' (~['\\\r\n\u0085\u2028\u2029] | CommonCharacter) '\'';
 REGULAR_STRING:                      '"'  (~["\\\r\n\u0085\u2028\u2029] | CommonCharacter)* '"';
@@ -190,9 +192,9 @@ if (interpolatedStringLevel > 0)
 {
     int ind = 1;
     bool switchToFormatString = true;
-    while ((char)_input.La(ind) != '}')
+    while ((char)InputStream.La(ind) != '}')
     {
-        if (_input.La(ind) == ':' || _input.La(ind) == ')')
+        if (InputStream.La(ind) == ':' || InputStream.La(ind) == ')')
         {
             switchToFormatString = false;
             break;
@@ -241,6 +243,8 @@ OP_OR_ASSIGNMENT:         '|=';
 OP_XOR_ASSIGNMENT:        '^=';
 OP_LEFT_SHIFT:            '<<';
 OP_LEFT_SHIFT_ASSIGNMENT: '<<=';
+OP_COALESCING_ASSIGNMENT: '??=';
+OP_RANGE:                 '..';
 
 // https://msdn.microsoft.com/en-us/library/dn961160.aspx
 mode INTERPOLATION_STRING;
@@ -278,6 +282,7 @@ WARNING:                       'warning' Whitespace+            -> channel(DIREC
 REGION:                        'region' Whitespace*             -> channel(DIRECTIVE), mode(DIRECTIVE_TEXT);
 ENDREGION:                     'endregion' Whitespace*          -> channel(DIRECTIVE), mode(DIRECTIVE_TEXT);
 PRAGMA:                        'pragma' Whitespace+             -> channel(DIRECTIVE), mode(DIRECTIVE_TEXT);
+NULLABLE:                      'nullable' Whitespace+           -> channel(DIRECTIVE), mode(DIRECTIVE_TEXT);
 DIRECTIVE_DEFAULT:             'default'                        -> channel(DIRECTIVE), type(DEFAULT);
 DIRECTIVE_HIDDEN:              'hidden'                         -> channel(DIRECTIVE);
 DIRECTIVE_OPEN_PARENS:         '('                              -> channel(DIRECTIVE), type(OPEN_PARENS);
@@ -310,7 +315,7 @@ fragment NewLineCharacter
     ;
 
 fragment IntegerTypeSuffix:         [lL]? [uU] | [uU]? [lL];
-fragment ExponentPart:              [eE] ('+' | '-')? [0-9]+;
+fragment ExponentPart:              [eE] ('+' | '-')? [0-9] ('_'* [0-9])*;
 
 fragment CommonCharacter
     : SimpleEscapeSequence

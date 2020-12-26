@@ -19,9 +19,9 @@ namespace NRules.RuleSharp
             _contextTypes.Push(contextTypes);
         }
 
-        public override Expression VisitEmbeddedStatement(EmbeddedStatementContext context)
+        public override Expression VisitEmbedded_statement(Embedded_statementContext context)
         {
-            var expression = base.VisitEmbeddedStatement(context);
+            var expression = base.VisitEmbedded_statement(context);
             return expression;
         }
 
@@ -45,10 +45,10 @@ namespace NRules.RuleSharp
             var statements = new List<Expression>();
             foreach (var statementContext in context.statement())
             {
-                if (statementContext is DeclarationStatementContext)
+                if (statementContext.declarationStatement() != null)
                 {
                     var declarationParser = new DeclarationParser(_parserContext);
-                    var declarationResult = declarationParser.Visit(statementContext);
+                    var declarationResult = declarationParser.Visit(statementContext.declarationStatement());
                     declarations.AddRange(declarationResult.Declarations);
                     statements.AddRange(declarationResult.Initializers);
                 }
@@ -107,8 +107,7 @@ namespace NRules.RuleSharp
 
         public override Expression VisitPrimary_expression(Primary_expressionContext context)
         {
-            var builder = new PrimaryExpressionBuilder(_parserContext);
-            builder.Context(context);
+            var builder = new PrimaryExpressionBuilder(_parserContext, context);
 
             var pe = context.pe;
             if (pe is LiteralExpressionContext l)
@@ -136,7 +135,7 @@ namespace NRules.RuleSharp
                     builder.NamePart(sn.GetText());
                 }
             }
-            else if (pe is ParenthesisExpressionContext pre)
+            else if (pe is ParenthesisExpressionsContext pre)
             {
                 var innerExpression = Visit(pre.expression());
                 builder.ExpressionStart(innerExpression);
@@ -214,11 +213,10 @@ namespace NRules.RuleSharp
 
             foreach (var child in context.children.Skip(1))
             {
-                builder.Context(child);
-                if (child is Member_accessContext)
+                if (child is Member_accessContext mac)
                 {
                     var memberName = child.GetText().TrimStart('.');
-                    builder.Member(memberName);
+                    builder.Member(memberName, mac.identifier());
                 }
                 else if (child is Method_invocationContext mi)
                 {
@@ -327,10 +325,10 @@ namespace NRules.RuleSharp
         public override Expression VisitConditional_expression(Conditional_expressionContext context)
         {
             var expression = Visit(context.children[0]);
-            if (context.expression().Any())
+            if (context.throwable_expression().Any())
             {
-                var expression1 = Visit(context.expression()[0]);
-                var expression2 = Visit(context.expression()[1]);
+                var expression1 = Visit(context.throwable_expression()[0]);
+                var expression2 = Visit(context.throwable_expression()[1]);
                 expression = Expression.Condition(expression, expression1, expression2);
             }
             return expression;
