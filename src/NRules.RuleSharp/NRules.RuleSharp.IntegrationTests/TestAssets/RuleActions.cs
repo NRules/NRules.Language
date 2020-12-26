@@ -24,5 +24,9 @@ namespace NRules.RuleSharp.IntegrationTests.TestAssets
         {
             return s => { };
         }
+
+        public static void MethodWithOptionalParam(TestFact1 fact1, string optionalParam = null)
+        {
+        }
     }
 }

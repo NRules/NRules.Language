@@ -107,8 +107,7 @@ namespace NRules.RuleSharp
 
         public override Expression VisitPrimary_expression(Primary_expressionContext context)
         {
-            var builder = new PrimaryExpressionBuilder(_parserContext);
-            builder.Context(context);
+            var builder = new PrimaryExpressionBuilder(_parserContext, context);
 
             var pe = context.pe;
             if (pe is LiteralExpressionContext l)
@@ -214,11 +213,10 @@ namespace NRules.RuleSharp
 
             foreach (var child in context.children.Skip(1))
             {
-                builder.Context(child);
-                if (child is Member_accessContext)
+                if (child is Member_accessContext mac)
                 {
                     var memberName = child.GetText().TrimStart('.');
-                    builder.Member(memberName);
+                    builder.Member(memberName, mac.identifier());
                 }
                 else if (child is Method_invocationContext mi)
                 {

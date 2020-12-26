@@ -94,7 +94,7 @@ then
             var ex = Assert.Throws<RulesParseException>(() => Repository.LoadText(text));
             Assert.StartsWith("Type member not found. Type=NRules.RuleSharp.IntegrationTests.TestAssets.TestFact1, Member=MemberZ", ex.Message);
             Assert.Equal(4, ex.Location.LineNumber);
-            Assert.Equal(31, ex.Location.ColumnNumber);
+            Assert.Equal(32, ex.Location.ColumnNumber);
         }
 
         [Fact]
@@ -111,7 +111,7 @@ then
             var ex = Assert.Throws<RulesParseException>(() => Repository.LoadText(text));
             Assert.StartsWith("Unknown identifier. Identifier=RuleActionsZ.NoOp", ex.Message);
             Assert.Equal(7, ex.Location.LineNumber);
-            Assert.Equal(21, ex.Location.ColumnNumber);
+            Assert.Equal(4, ex.Location.ColumnNumber);
         }
 
         [Fact]
@@ -145,7 +145,42 @@ then
             var ex = Assert.Throws<RulesParseException>(() => Repository.LoadText(text));
             Assert.StartsWith("Type member not found. Type=NRules.RuleSharp.IntegrationTests.TestAssets.RuleActions, Member=MethodZ", ex.Message);
             Assert.Equal(7, ex.Location.LineNumber);
-            Assert.Equal(15, ex.Location.ColumnNumber);
+            Assert.Equal(16, ex.Location.ColumnNumber);
+        }
+        
+        [Fact]
+        public void Action_MethodWithOptionalParameters_ThrowsWithSourceLocation()
+        {
+            var text = @"
+rule TestRule
+when
+    var fact = TestFact1();
+    
+then
+    RuleActions.MethodWithOptionalParam(fact);
+";
+            var ex = Assert.Throws<RulesParseException>(() => Repository.LoadText(text));
+            Assert.StartsWith("Method not found. Type=NRules.RuleSharp.IntegrationTests.TestAssets.RuleActions, Method=MethodWithOptionalParam", ex.Message);
+            Assert.Equal(7, ex.Location.LineNumber);
+            Assert.Equal(16, ex.Location.ColumnNumber);
+        }
+        
+        [Fact]
+        public void Action_InvalidIndexer_ThrowsWithSourceLocation()
+        {
+            var text = @"
+rule TestRule
+when
+    var fact = TestFact1();
+    
+then
+    var item = fact.BoolProperty[0];
+    RuleActions.NoOp(fact);
+";
+            var ex = Assert.Throws<RulesParseException>(() => Repository.LoadText(text));
+            Assert.StartsWith("Type does not have indexer property. Type=System.Boolean", ex.Message);
+            Assert.Equal(7, ex.Location.LineNumber);
+            Assert.Equal(20, ex.Location.ColumnNumber);
         }
     }
 }

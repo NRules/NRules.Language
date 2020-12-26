@@ -13,11 +13,13 @@
 
         /// <summary>
         /// Line number of where the error is.
+        /// The value is 1..n.
         /// </summary>
         public int LineNumber { get; internal set; }
 
         /// <summary>
         /// Column number of where the error is.
+        /// The value is 0..n.
         /// </summary>
         public int ColumnNumber { get; internal set; }
 
