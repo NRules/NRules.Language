@@ -7,7 +7,7 @@
     <authors>Sergiy Nikolayev</authors>
     <owners>Sergiy Nikolayev</owners>
     <license type="expression">MIT</license>
-    <projectUrl>http://nrules.net</projectUrl>
+    <projectUrl>https://nrules.net</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/NRules/NRules.media/master/Logo/Logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>Business rules language for the NRules rules engine.</summary>
@@ -17,12 +17,12 @@
     <tags>nrules business rules language dsl</tags>
     <dependencies>
       <group targetFramework="net45">
-        <dependency id="NRules.RuleModel" version="[0.9.0]" />
-        <dependency id="Antlr4.Runtime" version="4.6.5" />
+        <dependency id="NRules.RuleModel" version="[0.9.1]" />
+        <dependency id="Antlr4.Runtime" version="4.6.6" />
       </group>
       <group targetFramework="netstandard2.0">
-        <dependency id="NRules.RuleModel" version="[0.9.0]" />
-        <dependency id="Antlr4.Runtime" version="4.6.5" />
+        <dependency id="NRules.RuleModel" version="[0.9.1]" />
+        <dependency id="Antlr4.Runtime" version="4.6.6" />
       </group>
     </dependencies>
   </metadata>
