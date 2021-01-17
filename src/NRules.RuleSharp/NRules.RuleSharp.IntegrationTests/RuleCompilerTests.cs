@@ -7,6 +7,14 @@ namespace NRules.RuleSharp.IntegrationTests
     public class RuleCompilerTests : BaseRuleTestFixture
     {
         [Fact]
+        public void Compile_EmptyFile_Succeeds()
+        {
+            var text = "";
+            Repository.LoadText(text);
+            Repository.Compile();
+        }
+
+        [Fact]
         public void Metadata_TwoRulesWithMetadata_Loads()
         {
             var text = @"

@@ -13,7 +13,7 @@ namespace NRules.RuleSharp
             var interval = context.SourceInterval;
             var tokens = tokenStream.Get(interval.a, interval.b);
             var location = new SourceLocation();
-            if (tokens.Count > 0)
+            if (tokens?.Count > 0)
             {
                 location.LineNumber = tokens[0].Line;
                 location.ColumnNumber = tokens[0].Column;

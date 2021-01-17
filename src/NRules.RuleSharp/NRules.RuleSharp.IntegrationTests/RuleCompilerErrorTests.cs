@@ -6,6 +6,15 @@ namespace NRules.RuleSharp.IntegrationTests
     public class RuleCompilerErrorTests : BaseRuleTestFixture
     {
         [Fact]
+        public void File_GarbageText_ThrowsWithoutSourceLocation()
+        {
+            var text = @"abc";
+            var ex = Assert.Throws<RulesParseException>(() => Repository.LoadText(text));
+            Assert.Equal(0, ex.Location.LineNumber);
+            Assert.Equal(0, ex.Location.ColumnNumber);
+        }
+
+        [Fact]
         public void Rule_MissingRuleName_ThrowsWithSourceLocation()
         {
             var text = @"
