@@ -1,6 +1,8 @@
 version: 0.0.6.{build}
 configuration: Release
 
+image: Visual Studio 2019
+
 skip_tags: true
 
 nuget:
