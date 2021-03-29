@@ -23,12 +23,7 @@ $components = @{
             frameworks = @('net48', 'netcoreapp3.1')
         }
         bin = @{
-            frameworks = @('net45', 'netstandard2.0')
-            'net45' = @{
-                include = @(
-                    "NRules.RuleSharp\bin\$configuration\net45"
-                )
-            }
+            frameworks = @('netstandard2.0')
             'netstandard2.0' = @{
                 include = @(
                     "NRules.RuleSharp\bin\$configuration\netstandard2.0"
