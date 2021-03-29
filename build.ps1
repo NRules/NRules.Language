@@ -23,7 +23,7 @@ $components = @{
             frameworks = @('net48', 'netcoreapp3.1')
         }
         bin = @{
-            frameworks = @('netstandard2.0')
+            artifacts = @('netstandard2.0')
             'netstandard2.0' = @{
                 include = @(
                     "NRules.RuleSharp\bin\$configuration\netstandard2.0"
