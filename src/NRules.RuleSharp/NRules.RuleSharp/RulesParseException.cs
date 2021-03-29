@@ -27,12 +27,22 @@ namespace NRules.RuleSharp
             get
             {
                 var sb = new StringBuilder();
-                sb.AppendLine(base.Message);
+                sb.Append(base.Message);
+
                 if (!string.IsNullOrEmpty(Location.FileName))
-                    sb.AppendLine($"File={Location.FileName}");
-                sb.AppendLine($"Line={Location.LineNumber}");
-                sb.AppendLine($"Column={Location.ColumnNumber}");
-                sb.Append($"Source={Location.Text}");
+                {
+                    sb.AppendLine();
+                    sb.Append($"File={Location.FileName}");
+                }
+
+                if (Location.LineNumber > 0)
+                {
+                    sb.AppendLine();
+                    sb.AppendLine($"Line={Location.LineNumber}");
+                    sb.AppendLine($"Column={Location.ColumnNumber}");
+                    sb.Append($"Source={Location.Text}");
+                }
+
                 return sb.ToString();
             }
         }

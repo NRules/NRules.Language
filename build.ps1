@@ -3,7 +3,7 @@ param (
     [string]$component = 'Core'
 )
 
-$version = '0.0.6'
+$version = '0.0.7'
 $configuration = 'Release'
 
 if (Test-Path Env:CI) { $version = $Env:APPVEYOR_BUILD_VERSION }
@@ -23,12 +23,7 @@ $components = @{
             frameworks = @('net48', 'netcoreapp3.1')
         }
         bin = @{
-            frameworks = @('net45', 'netstandard2.0')
-            'net45' = @{
-                include = @(
-                    "NRules.RuleSharp\bin\$configuration\net45"
-                )
-            }
+            artifacts = @('netstandard2.0')
             'netstandard2.0' = @{
                 include = @(
                     "NRules.RuleSharp\bin\$configuration\netstandard2.0"
@@ -57,7 +52,7 @@ if ($component -eq "Core") {
 Import-Module .\tools\build\psake.psm1
 $baseDir = Resolve-Path .
 $componentList | % {
-    Invoke-psake .\tools\build\default.ps1 $target -properties @{version=$version;configuration=$configuration;baseDir=$baseDir} -parameters @{component=$components[$_]}
+    Invoke-psake .\tools\build\psakefile.ps1 $target -properties @{version=$version;configuration=$configuration;baseDir=$baseDir} -parameters @{component=$components[$_]}
     if (-not $psake.build_success) {
         break
     }

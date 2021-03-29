@@ -3,7 +3,7 @@
   <Import Project="..\..\..\Common.props" />
   
   <PropertyGroup>
-    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\SigningKey.snk</AssemblyOriginatorKeyFile>
@@ -12,7 +12,7 @@
   <ItemGroup>
     <PackageReference Include="Antlr4.CodeGenerator" Version="4.6.6" PrivateAssets="All" />
     <PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
-    <PackageReference Include="NRules.RuleModel" Version="0.9.1" />
+    <PackageReference Include="NRules.RuleModel" Version="0.9.2" />
   </ItemGroup>
 
   <ItemGroup>
