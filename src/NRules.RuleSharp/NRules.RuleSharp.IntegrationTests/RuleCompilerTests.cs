@@ -316,5 +316,26 @@ then
             Repository.LoadText(text);
             Repository.Compile();
         }
+
+        [Fact]
+        public void Match_NumericLiterals_Loads()
+        {
+            var text = @"
+rule TestRule
+when
+    var fact = TestFact1();
+    
+then
+    var l1 = 1000L;
+    var u1 = 1000U;
+    var ul1 = 1000UL;
+    var ul2 = 1000LU;
+    var m1 = 1000.0M;
+    var d1 = 1000.0D;
+    var f1 = 1000.0F;
+";
+            Repository.LoadText(text);
+            Repository.Compile();
+        }
     }
 }
