@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq.Expressions;
 using NRules.RuleSharp.Parser;
 using static NRules.RuleSharp.Parser.RuleSharpParser;
@@ -23,31 +24,31 @@ namespace NRules.RuleSharp
 
                 if (literal.EndsWith("UL") || literal.EndsWith("LU"))
                 {
-                    if (UInt64.TryParse(number, out var result))
+                    if (UInt64.TryParse(number, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
                         return Expression.Constant(result, typeof(UInt64));
                     throw new InternalParseException("Unsupported literal", context);
                 }
                 if (literal.EndsWith("L"))
                 {
-                    if (Int64.TryParse(number, out var result))
+                    if (Int64.TryParse(number, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
                         return Expression.Constant(result, typeof(Int64));
                     throw new InternalParseException("Unsupported literal", context);
                 }
 
                 if (literal.EndsWith("U"))
                 {
-                    if (UInt32.TryParse(number, out var uintResult))
+                    if (UInt32.TryParse(number, NumberStyles.Any, CultureInfo.InvariantCulture, out var uintResult))
                         return Expression.Constant(uintResult, typeof(UInt32));
 
-                    if (UInt64.TryParse(number, out var ulongResult))
+                    if (UInt64.TryParse(number, NumberStyles.Any, CultureInfo.InvariantCulture, out var ulongResult))
                         return Expression.Constant(ulongResult, typeof(UInt64));
                 }
                 else
                 {
-                    if (Int32.TryParse(number, out var intResult))
+                    if (Int32.TryParse(number, NumberStyles.Any, CultureInfo.InvariantCulture, out var intResult))
                         return Expression.Constant(intResult, typeof(Int32));
 
-                    if (Int64.TryParse(number, out var longResult))
+                    if (Int64.TryParse(number, NumberStyles.Any, CultureInfo.InvariantCulture, out var longResult))
                         return Expression.Constant(longResult, typeof(Int64));
                 }
             }
@@ -72,23 +73,23 @@ namespace NRules.RuleSharp
                 var number = literal.TrimEnd('M', 'D', 'F');
                 if (literal.EndsWith("M"))
                 {
-                    if (Decimal.TryParse(number, out var result))
+                    if (Decimal.TryParse(number, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
                         return Expression.Constant(result, typeof(decimal));
                     throw new InternalParseException("Unsupported literal", context);
                 }
                 if (literal.EndsWith("D"))
                 {
-                    if (Double.TryParse(number, out var result))
+                    if (Double.TryParse(number, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
                         return Expression.Constant(result, typeof(double));
                     throw new InternalParseException("Unsupported literal", context);
                 }
                 if (literal.EndsWith("F"))
                 {
-                    if (Single.TryParse(number, out var result))
+                    if (Single.TryParse(number, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
                         return Expression.Constant(result, typeof(float));
                     throw new InternalParseException("Unsupported literal", context);
                 }
-                if (Double.TryParse(number, out var doubleResult))
+                if (Double.TryParse(number, NumberStyles.Any, CultureInfo.InvariantCulture, out var doubleResult))
                     return Expression.Constant(doubleResult, typeof(double));
             }
 
