@@ -22,8 +22,9 @@ using System;
 using NRules.RuleSharp.IntegrationTests.TestAssets;
 
 rule ""Metadata Rule 1""
-    description ""Rule with description and priority""
+    description ""Rule with description, priority and repeatability""
     priority 10
+    repeatable false
     when
         var fact = TestFact1();
     
@@ -46,10 +47,36 @@ rule ""Metadata Rule 2""
             var rules = Repository.GetRules().ToArray();
             Assert.Equal(2, rules.Length);
             Assert.Equal("Metadata Rule 1", rules[0].Name);
-            Assert.Equal("Rule with description and priority", rules[0].Description);
+            Assert.Equal("Rule with description, priority and repeatability", rules[0].Description);
             Assert.Equal(10, rules[0].Priority);
+            Assert.Equal(RuleModel.RuleRepeatability.NonRepeatable, rules[0].Repeatability);
             Assert.Equal("Metadata Rule 2", rules[1].Name);
             Assert.Equal(new []{"Metadata", "Test"}, rules[1].Tags);
+        }
+
+        [Fact]
+        public void Metadata_RuleWithMetadata_Loads()
+        {
+            var text = @"
+using System;
+using NRules.RuleSharp.IntegrationTests.TestAssets;
+
+rule ""Metadata Rule""
+    description ""Rule with description and repeatability""
+    repeatable true
+    when
+        var fact = TestFact1();
+    
+    then
+        RuleActions.NoOp();
+";
+            Repository.LoadText(text);
+            Repository.Compile();
+
+            var rules = Repository.GetRules().ToArray();
+            Assert.Equal("Metadata Rule", rules[0].Name);
+            Assert.Equal("Rule with description and repeatability", rules[0].Description);
+            Assert.Equal(RuleModel.RuleRepeatability.Repeatable, rules[0].Repeatability);
         }
 
         [Fact]

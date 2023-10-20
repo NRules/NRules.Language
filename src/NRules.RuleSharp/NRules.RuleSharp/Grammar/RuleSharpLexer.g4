@@ -135,6 +135,7 @@ DESCRIPTION:   'description';
 EXISTS:        'exists';
 NOT:           'not';
 PRIORITY:      'priority';
+REPEATABLE:    'repeatable';
 RULE:          'rule';
 TAG:           'tag';
 THEN:          'then';
