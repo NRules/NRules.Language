@@ -45,6 +45,12 @@ namespace NRules.RuleSharp
             _builder.Priority(priotity);
         }
 
+        public override void EnterRule_repeatable(Rule_repeatableContext context)
+        {
+            var value = context.value;
+            _builder.Repeatability(value.FALSE() != null ? RuleRepeatability.NonRepeatable : RuleRepeatability.Repeatable);
+        }
+
         public override void EnterRule_tags(Rule_tagsContext context)
         {
             var tags = context._values.Select(x => x.GetText().TrimStart('@').Trim('"'));
