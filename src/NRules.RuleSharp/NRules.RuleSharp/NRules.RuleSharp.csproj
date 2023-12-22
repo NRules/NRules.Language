@@ -1,6 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\..\Common.props" />
+  <PropertyGroup>
+    <Title>NRules.RuleSharp</Title>
+    <Description>Business rules language for NRules rules engine.</Description>
+    <PackageId>NRules.RuleSharp</PackageId>
+    <PackageTags>nrules;business;rules;language;dsl</PackageTags>
+  </PropertyGroup>
   
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
@@ -10,14 +15,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Antlr4.CodeGenerator" Version="4.6.6" PrivateAssets="All" />
-    <PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
-    <PackageReference Include="NRules.RuleModel" Version="0.9.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\..\..\GlobalAssemblyInfo.cs" Link="Properties\GlobalAssemblyInfo.cs" />
-    <Compile Include="..\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
+    <PackageReference Include="Antlr4.CodeGenerator" PrivateAssets="All" />
+    <PackageReference Include="Antlr4.Runtime" />
+    <PackageReference Include="NRules.RuleModel" />
   </ItemGroup>
 
   <ItemGroup>

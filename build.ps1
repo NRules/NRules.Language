@@ -12,25 +12,16 @@ if (Test-Path Env:CI) { $configuration = $Env:CONFIGURATION }
 $components = @{
     'NRules.RuleSharp' = @{
         name = 'NRules.RuleSharp'
-        restore = @{
-            tool = 'dotnet'
-        }
-        build = @{
-            tool = 'dotnet'
-        }
-        test = @{
-            location = 'NRules.RuleSharp.IntegrationTests'
-            frameworks = @('net48', 'netcoreapp3.1')
-        }
-        bin = @{
-            artifacts = @('netstandard2.0')
-            'netstandard2.0' = @{
-                include = @(
-                    "NRules.RuleSharp\bin\$configuration\netstandard2.0"
-                )
-            }
-        }
+        solution_file = 'src\NRules.RuleSharp\NRules.RuleSharp.sln'
         package = @{
+            bin = @{
+                artifacts = @('netstandard2.0')
+                'netstandard2.0' = @{
+                    include = @(
+                        "NRules.RuleSharp\bin\$configuration\netstandard2.0"
+                    )
+                }
+            }
             nuget = @(
                 'NRules.RuleSharp'
             )
