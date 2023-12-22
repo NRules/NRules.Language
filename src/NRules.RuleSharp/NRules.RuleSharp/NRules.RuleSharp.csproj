@@ -12,6 +12,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\SigningKey.snk</AssemblyOriginatorKeyFile>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
