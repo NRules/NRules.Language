@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Title>NRules.RuleSharp</Title>
+    <Title>NRules RuleSharp</Title>
     <Description>Business rules language for NRules rules engine.</Description>
     <PackageId>NRules.RuleSharp</PackageId>
     <PackageTags>nrules;business;rules;language;dsl</PackageTags>
