@@ -1266,6 +1266,7 @@ rule_attribute_list
 rule_attribute
     : DESCRIPTION value=string_literal #rule_description
     | PRIORITY value=INTEGER_LITERAL #rule_priority
+    | REPEATABLE value=boolean_literal #rule_repeatable
     | TAG values+=string_literal (',' values+=string_literal)* #rule_tags
     ;
 

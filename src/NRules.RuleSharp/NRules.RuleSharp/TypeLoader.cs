@@ -3,47 +3,46 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace NRules.RuleSharp
+namespace NRules.RuleSharp;
+
+internal interface ITypeLoader
 {
-    internal interface ITypeLoader
+    Type FindType(string typeName);
+    Type[] GetTypes();
+}
+
+internal class TypeLoader : ITypeLoader
+{
+    private readonly List<Assembly> _references = new List<Assembly>();
+
+    public Type[] GetTypes()
     {
-        Type FindType(string typeName);
-        Type[] GetTypes();
+        return _references.SelectMany(assembly => assembly.GetTypes()).ToArray();
     }
 
-    internal class TypeLoader : ITypeLoader
+    public Type FindType(string typeName)
     {
-        private readonly List<Assembly> _references = new List<Assembly>();
+        Type type = Type.GetType(typeName);
+        if (type != null) return type;
 
-        public Type[] GetTypes()
+        foreach (var assembly in _references)
         {
-            return _references.SelectMany(assembly => assembly.GetTypes()).ToArray();
-        }
-
-        public Type FindType(string typeName)
-        {
-            Type type = Type.GetType(typeName);
-            if (type != null) return type;
-
-            foreach (var assembly in _references)
+            type = assembly.GetType(typeName);
+            if (type != null)
             {
-                type = assembly.GetType(typeName);
-                if (type != null)
-                {
-                    return type;
-                }
+                return type;
             }
-            return null;
         }
+        return null;
+    }
         
-        public void AddReferences(IEnumerable<Assembly> assemblies)
-        {
-            _references.AddRange(assemblies);
-        }
+    public void AddReferences(IEnumerable<Assembly> assemblies)
+    {
+        _references.AddRange(assemblies);
+    }
 
-        public void AddReference(Assembly assembly)
-        {
-            _references.Add(assembly);
-        }
+    public void AddReference(Assembly assembly)
+    {
+        _references.Add(assembly);
     }
 }

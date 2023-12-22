@@ -3,40 +3,39 @@ using System.Linq.Expressions;
 using NRules.RuleSharp.Parser;
 using static NRules.RuleSharp.Parser.RuleSharpParser;
 
-namespace NRules.RuleSharp
+namespace NRules.RuleSharp;
+
+internal class DeclarationParser : RuleSharpParserBaseVisitor<DeclarationResult>
 {
-    internal class DeclarationParser : RuleSharpParserBaseVisitor<DeclarationResult>
+    private readonly ParserContext _parserContext;
+
+    public DeclarationParser(ParserContext parserContext)
     {
-        private readonly ParserContext _parserContext;
+        _parserContext = parserContext;
+    }
 
-        public DeclarationParser(ParserContext parserContext)
+    public override DeclarationResult VisitDeclarationStatement(DeclarationStatementContext context)
+    {
+        var declarations = new List<ParameterExpression>();
+        var statements = new List<Expression>();
+
+        var variableContext = context.local_variable_declaration();
+        if (variableContext != null)
         {
-            _parserContext = parserContext;
-        }
-
-        public override DeclarationResult VisitDeclarationStatement(DeclarationStatementContext context)
-        {
-            var declarations = new List<ParameterExpression>();
-            var statements = new List<Expression>();
-
-            var variableContext = context.local_variable_declaration();
-            if (variableContext != null)
+            foreach (var declaratorContext in variableContext.local_variable_declarator())
             {
-                foreach (var declaratorContext in variableContext.local_variable_declarator())
-                {
-                    var expressionParser = new ExpressionParser(_parserContext);
-                    var initializer = expressionParser.Visit(declaratorContext.local_variable_initializer());
+                var expressionParser = new ExpressionParser(_parserContext);
+                var initializer = expressionParser.Visit(declaratorContext.local_variable_initializer());
 
-                    var parameter = Expression.Variable(initializer.Type, declaratorContext.identifier().GetText());
-                    var expression = Expression.Assign(parameter, initializer);
+                var parameter = Expression.Variable(initializer.Type, declaratorContext.identifier().GetText());
+                var expression = Expression.Assign(parameter, initializer);
 
-                    declarations.Add(parameter);
-                    statements.Add(expression);
-                    _parserContext.Scope.Declare(parameter);
-                }
+                declarations.Add(parameter);
+                statements.Add(expression);
+                _parserContext.Scope.Declare(parameter);
             }
-
-            return new DeclarationResult(declarations, statements);
         }
+
+        return new DeclarationResult(declarations, statements);
     }
 }
