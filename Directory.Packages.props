@@ -3,8 +3,8 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="NRules.RuleModel" Version="0.9.3" />
-    <PackageVersion Include="NRules.Runtime" Version="0.9.3" />
+    <PackageVersion Include="NRules.RuleModel" Version="0.9.4" />
+    <PackageVersion Include="NRules.Runtime" Version="0.9.4" />
     <PackageVersion Include="Antlr4.CodeGenerator" Version="4.6.6" />
     <PackageVersion Include="Antlr4.Runtime" Version="4.6.6" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
