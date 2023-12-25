@@ -43,6 +43,7 @@ if ($component -eq "Core") {
     $componentList += $samples
 } elseif ($component -eq "All") {
     $componentList += $core
+    $componentList += $samples
 } else {
     $componentList += $component
 }
