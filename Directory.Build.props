@@ -21,7 +21,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageIconUrl>https://raw.githubusercontent.com/NRules/NRules.media/master/Logo/Logo.png</PackageIconUrl>
     <PackageProjectUrl>https://nrules.net</PackageProjectUrl>
-    <PackageReleaseNotes>https://github.com/NRules/NRules.Language/releases/v$version$</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/NRules/NRules.Language/releases/v$(Version)</PackageReleaseNotes>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
