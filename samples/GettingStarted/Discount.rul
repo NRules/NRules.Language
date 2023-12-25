@@ -1,0 +1,10 @@
+using GettingStarted.Domain;
+
+rule "Order Discount"
+when
+    var customer = Customer(x => x.IsPreferred);
+    var order = Order(x => !x.IsDiscounted, x => x.Quantity > 10);
+    
+then
+    order.PercentDiscount = 5.0;
+    Console.WriteLine("Applied discount. Customer={0}, Discount={1}", customer.Name, order.PercentDiscount);

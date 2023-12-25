@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NRules.RuleModel" />
+    <PackageReference Include="NRules.Runtime" />
+    <PackageReference Include="Antlr4.Runtime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="NRules.RuleSharp">
+      <HintPath>..\..\build\bin\NRules.RuleSharp\netstandard2.0\NRules.RuleSharp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Discount.rul">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

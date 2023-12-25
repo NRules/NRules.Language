@@ -27,13 +27,20 @@ $components = @{
             )
         }
     };
+    'Samples.GettingStarted' = @{
+        name = 'GettingStarted'
+        solution_file = 'samples\GettingStarted\GettingStarted.sln'
+    };
 }
 
 $core = @('NRules.RuleSharp')
+$samples = $components.keys | Where-Object { $_.StartsWith("Samples.") }
 
 $componentList = @()
 if ($component -eq "Core") {
     $componentList += $core
+} elseif ($component -eq "Samples") {
+    $componentList += $samples
 } elseif ($component -eq "All") {
     $componentList += $core
 } else {
