@@ -8,42 +8,37 @@ Rule# (Rule Sharp) is a business rules language for NRules rules engine.
 
 ## Installing Rule#
 
-First, [install NuGet](https://docs.microsoft.com/nuget/guides/install-nuget). Then, from the Package Manager Console:
+To compile Rule# rules to the canonical form, get [NRules.RuleSharp](https://www.nuget.org/packages/NRules.RuleSharp) from nuget via the package manager
+```console
+> Install-Package NRules.RuleSharp
+```
 
-To compile Rule# rules to the canonical form, install [NRules.RuleSharp](https://www.nuget.org/packages/NRules.RuleSharp):
-
-    PM> Install-Package NRules.RuleSharp
-
-To compile rules in the canonical form to the runtime model and to be able to execute rules, install [NRules.Runtime](https://www.nuget.org/packages/NRules.Runtime):
-
-    PM> Install-Package NRules.Runtime
+To compile rules in the canonical form to the runtime model and to be able to execute rules, install [NRules.Runtime](https://www.nuget.org/packages/NRules.Runtime)
+```console
+> Install-Package NRules.Runtime
+```
     
 ## Getting Started
 
 In NRules, rules are expressed against a domain model.
-Given the following domain model (located in the ```Domain``` assembly):
+Given the following domain model (located in the ```Domain``` namespace):
 
 ```c#
-namespace Domain
-{
-    public class Customer
-    {
-        public string Name { get; set; }
-        public bool IsPreferred { get; set; }
-    }
-    
-    public class Order
-    {
-        public int Quantity { get; set; }
-        public double UnitPrice { get; set; }
-        public double PercentDiscount { get; set; }
-        public bool IsDiscounted { get { return PercentDiscount > 0; } }
+namespace Domain;
 
-        public double Price
-        {
-            get { return UnitPrice*Quantity*(1.0 - PercentDiscount/100.0); }
-        }
-    }
+public class Customer
+{
+    public string Name { get; set; }
+    public bool IsPreferred { get; set; }
+}
+
+public class Order
+{
+    public int Quantity { get; set; }
+    public double UnitPrice { get; set; }
+    public double PercentDiscount { get; set; }
+    public bool IsDiscounted => PercentDiscount > 0;
+    public double Price => UnitPrice*Quantity*(1.0 - PercentDiscount/100.0);
 }
 ```
 
@@ -84,6 +79,18 @@ session.InsertAll(new[] {order1, order2});
 
 session.Fire();
 ```
+
+## Getting Help
+
+Use the following discussion and Q&A platforms to get help with NRules Rule#
+
+- [Discussions](https://github.com/NRules/NRules/discussions)
+- [Stack Overflow](https://stackoverflow.com/questions/tagged/nrules)
+- [Gitter Chat](https://gitter.im/NRules/NRules.Language)
+
+## Contributing
+
+See [Contributor Guide](https://github.com/NRules/NRules/blob/main/CONTRIBUTING.md) for the guidelines on how to contribute to the project.
 
 ---
 Copyright &copy; 2012-2023 [Sergiy Nikolayev](https://github.com/snikolayev) under the [MIT license](LICENSE.txt).
