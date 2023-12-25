@@ -80,6 +80,11 @@ session.InsertAll(new[] {order1, order2});
 session.Fire();
 ```
 
+This prints
+```console
+Applied discount. Customer=John Doe, Discount=5
+```
+
 ## Getting Help
 
 Use the following discussion and Q&A platforms to get help with NRules Rule#
