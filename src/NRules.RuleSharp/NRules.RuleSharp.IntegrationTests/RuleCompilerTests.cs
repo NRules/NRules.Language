@@ -110,6 +110,21 @@ then
     }
 
     [Fact]
+    public void Match_Nullable_Loads()
+    {
+        var text = @"
+rule TestRule
+when
+    var fact = TestFact1(x => x.NullableIntProperty.HasValue && x.NullableIntProperty.Value < 10);
+    
+then
+    RuleActions.NoOp(fact);
+";
+        Repository.LoadText(text);
+        Repository.Compile();
+    }
+
+    [Fact]
     public void Match_Or_Loads()
     {
         var text = @"
