@@ -215,6 +215,22 @@ then
         Repository.LoadText(text);
         Repository.Compile();
     }
+    
+    [Fact]
+    public void MemberAccess_NestedProperty_Loads()
+    {
+        var text = @"
+rule TestRule
+when
+    var fact = TestFact1();
+
+then
+    var itemLength = fact.ObjectProperty.StringProperty;
+    RuleActions.NoOp(fact);
+";
+        Repository.LoadText(text);
+        Repository.Compile();
+    }
 
     [Fact]
     public void MemberAccess_StringIndexAccess_Loads()

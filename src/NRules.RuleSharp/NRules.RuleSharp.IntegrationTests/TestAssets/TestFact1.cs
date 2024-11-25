@@ -9,4 +9,5 @@ public class TestFact1
     public bool BoolProperty { get; set; }
     public string[] ArrayProperty { get; set; }
     public List<string> ListProperty { get; set; }
+    public TestDto ObjectProperty { get; set; }
 }
