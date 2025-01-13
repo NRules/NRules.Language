@@ -3,7 +3,7 @@ param (
     [string]$component = 'Core'
 )
 
-$version = '0.0.9'
+$version = '0.1.0'
 $configuration = 'Release'
 
 if (Test-Path Env:CI) { $version = $Env:APPVEYOR_BUILD_VERSION }
@@ -27,22 +27,30 @@ $components = @{
             )
         }
     };
+    'Samples.GettingStarted' = @{
+        name = 'GettingStarted'
+        solution_file = 'samples\GettingStarted\GettingStarted.sln'
+    };
 }
 
 $core = @('NRules.RuleSharp')
+$samples = $components.keys | Where-Object { $_.StartsWith("Samples.") }
 
 $componentList = @()
 if ($component -eq "Core") {
     $componentList += $core
+} elseif ($component -eq "Samples") {
+    $componentList += $samples
 } elseif ($component -eq "All") {
     $componentList += $core
+    $componentList += $samples
 } else {
     $componentList += $component
 }
 
 Import-Module .\tools\build\psake.psm1
 $baseDir = Resolve-Path .
-$componentList | % {
+$componentList | ForEach-Object {
     Invoke-psake .\tools\build\psakefile.ps1 $target -properties @{version=$version;configuration=$configuration;baseDir=$baseDir} -parameters @{component=$components[$_]}
     if (-not $psake.build_success) {
         break

@@ -110,6 +110,21 @@ then
     }
 
     [Fact]
+    public void Match_Nullable_Loads()
+    {
+        var text = @"
+rule TestRule
+when
+    var fact = TestFact1(x => x.NullableIntProperty.HasValue && x.NullableIntProperty.Value < 10);
+    
+then
+    RuleActions.NoOp(fact);
+";
+        Repository.LoadText(text);
+        Repository.Compile();
+    }
+
+    [Fact]
     public void Match_Or_Loads()
     {
         var text = @"
@@ -210,6 +225,22 @@ when
 
 then
     var itemLength = fact.ListProperty[0].Length;
+    RuleActions.NoOp(fact);
+";
+        Repository.LoadText(text);
+        Repository.Compile();
+    }
+    
+    [Fact]
+    public void MemberAccess_NestedProperty_Loads()
+    {
+        var text = @"
+rule TestRule
+when
+    var fact = TestFact1();
+
+then
+    var itemLength = fact.ObjectProperty.StringProperty;
     RuleActions.NoOp(fact);
 ";
         Repository.LoadText(text);
