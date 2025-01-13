@@ -2,9 +2,7 @@
 
 Rule# (Rule Sharp) is a business rules language for NRules rules engine.
 
-> :warning: This project is currently in early development
-
-[![Build status](https://img.shields.io/appveyor/ci/nrules/nrules-language.svg)](https://ci.appveyor.com/project/NRules/nrules-language) [![NuGet](https://img.shields.io/nuget/v/NRules.RuleSharp.svg)](https://nuget.org/packages/NRules.RuleSharp) [![NRules on Stack Overflow](https://img.shields.io/badge/stack%20overflow-nrules-orange.svg)](http://stackoverflow.com/questions/tagged/nrules) [![Join the chat](https://img.shields.io/gitter/room/nrules/nrules.language.svg)](https://gitter.im/nrules/nrules.language)
+[![Build status](https://img.shields.io/appveyor/build/NRules/NRules-Language)](https://ci.appveyor.com/project/NRules/NRules-Language) [![NuGet](https://img.shields.io/nuget/v/NRules.RuleSharp)](https://nuget.org/packages/NRules.RuleSharp) [![NRules on Stack Overflow](https://img.shields.io/stackexchange/stackoverflow/t/nrules)](http://stackoverflow.com/questions/tagged/nrules) [![NRules GitHub Discussions](https://img.shields.io/github/discussions/NRules/NRules)](https://github.com/NRules/NRules/discussions)
 
 ## Installing Rule#
 
@@ -17,7 +15,7 @@ To compile rules in the canonical form to the runtime model and to be able to ex
 ```console
 > Install-Package NRules.Runtime
 ```
-    
+
 ## Getting Started
 
 In NRules, rules are expressed against a domain model.
@@ -91,7 +89,6 @@ Use the following discussion and Q&A platforms to get help with NRules Rule#
 
 - [Discussions](https://github.com/NRules/NRules/discussions)
 - [Stack Overflow](https://stackoverflow.com/questions/tagged/nrules)
-- [Gitter Chat](https://gitter.im/NRules/NRules.Language)
 
 ## Contributing
 
