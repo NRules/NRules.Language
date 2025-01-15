@@ -8,13 +8,8 @@
   <ItemGroup>
     <PackageReference Include="NRules.RuleModel" />
     <PackageReference Include="NRules.Runtime" />
+    <PackageReference Include="NRules.RuleSharp" />
     <PackageReference Include="Antlr4.Runtime" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="NRules.RuleSharp">
-      <HintPath>..\..\build\bin\NRules.RuleSharp\netstandard2.0\NRules.RuleSharp.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>
