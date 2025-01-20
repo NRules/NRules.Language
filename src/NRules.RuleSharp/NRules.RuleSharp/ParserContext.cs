@@ -10,7 +10,7 @@ internal class ParserContext
 {
     private readonly ITypeLoader _typeLoader;
     private readonly TypeMap _typeMap;
-    private readonly Stack<SymbolTable> _scopes = new Stack<SymbolTable>();
+    private readonly Stack<SymbolTable> _scopes = new();
 
     public ParserContext(ITypeLoader typeLoader, TypeMap typeMap)
     {
@@ -73,18 +73,11 @@ internal class ParserContext
         return extensionMethods;
     }
 
-    private class ScopeGuard : IDisposable
+    private sealed class ScopeGuard(ParserContext context) : IDisposable
     {
-        private readonly ParserContext _context;
-
-        public ScopeGuard(ParserContext context)
-        {
-            _context = context;
-        }
-
         public void Dispose()
         {
-            _context.PopScope();
+            context.PopScope();
         }
     }
 }

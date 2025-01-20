@@ -8,7 +8,7 @@ namespace NRules.RuleSharp;
 internal class SymbolTable
 {
     private readonly SymbolTable _parentScope;
-    private readonly Dictionary<string, ParameterExpression> _scope = new Dictionary<string, ParameterExpression>();
+    private readonly Dictionary<string, ParameterExpression> _scope = new();
 
     public SymbolTable()
     {

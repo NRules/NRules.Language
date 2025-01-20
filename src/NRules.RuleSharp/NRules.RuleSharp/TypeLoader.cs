@@ -13,7 +13,7 @@ internal interface ITypeLoader
 
 internal class TypeLoader : ITypeLoader
 {
-    private readonly List<Assembly> _references = new List<Assembly>();
+    private readonly List<Assembly> _references = new();
 
     public Type[] GetTypes()
     {

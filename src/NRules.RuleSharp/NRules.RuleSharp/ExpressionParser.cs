@@ -11,7 +11,7 @@ namespace NRules.RuleSharp;
 internal class ExpressionParser : RuleSharpParserBaseVisitor<Expression>
 {
     private readonly ParserContext _parserContext;
-    private readonly Stack<Type[]> _contextTypes = new Stack<Type[]>();
+    private readonly Stack<Type[]> _contextTypes = new();
 
     public ExpressionParser(ParserContext parserContext, params Type[] contextTypes)
     {

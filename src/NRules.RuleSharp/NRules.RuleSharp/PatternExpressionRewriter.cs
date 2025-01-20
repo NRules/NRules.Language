@@ -5,16 +5,11 @@ using NRules.RuleModel;
 
 namespace NRules.RuleSharp;
 
-internal class PatternExpressionRewriter : ExpressionRewriter
+internal class PatternExpressionRewriter(Declaration patternDeclaration, IEnumerable<ParameterExpression> declarations)
+    : ExpressionRewriter(declarations)
 {
     private ParameterExpression _originalParameter;
-    private readonly ParameterExpression _normalizedParameter;
-
-    public PatternExpressionRewriter(Declaration patternDeclaration, IEnumerable<ParameterExpression> declarations)
-        : base(declarations)
-    {
-        _normalizedParameter = patternDeclaration.ToParameterExpression();
-    }
+    private readonly ParameterExpression _normalizedParameter = patternDeclaration.ToParameterExpression();
 
     protected override void InitParameters(LambdaExpression expression)
     {
@@ -26,7 +21,7 @@ internal class PatternExpressionRewriter : ExpressionRewriter
     {
         if (parameter == _originalParameter)
         {
-            return Parameters.First();
+            return Parameters[0];
         }
         return base.VisitParameter(parameter);
     }
