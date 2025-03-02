@@ -4,8 +4,8 @@
     <CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="NRules.RuleModel" Version="1.0.1" />
-    <PackageVersion Include="NRules.Runtime" Version="1.0.1" />
+    <PackageVersion Include="NRules.RuleModel" Version="1.0.2" />
+    <PackageVersion Include="NRules.Runtime" Version="1.0.2" />
     <PackageVersion Include="Antlr4.CodeGenerator" Version="4.6.6" />
     <PackageVersion Include="Antlr4.Runtime" Version="4.6.6" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
