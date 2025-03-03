@@ -5,15 +5,8 @@ using static NRules.RuleSharp.Parser.RuleSharpParser;
 
 namespace NRules.RuleSharp;
 
-internal class DeclarationParser : RuleSharpParserBaseVisitor<DeclarationResult>
+internal class DeclarationParser(ParserContext parserContext) : RuleSharpParserBaseVisitor<DeclarationResult>
 {
-    private readonly ParserContext _parserContext;
-
-    public DeclarationParser(ParserContext parserContext)
-    {
-        _parserContext = parserContext;
-    }
-
     public override DeclarationResult VisitDeclarationStatement(DeclarationStatementContext context)
     {
         var declarations = new List<ParameterExpression>();
@@ -24,7 +17,7 @@ internal class DeclarationParser : RuleSharpParserBaseVisitor<DeclarationResult>
         {
             foreach (var declaratorContext in variableContext.local_variable_declarator())
             {
-                var expressionParser = new ExpressionParser(_parserContext);
+                var expressionParser = new ExpressionParser(parserContext);
                 var initializer = expressionParser.Visit(declaratorContext.local_variable_initializer());
 
                 var parameter = Expression.Variable(initializer.Type, declaratorContext.identifier().GetText());
@@ -32,7 +25,7 @@ internal class DeclarationParser : RuleSharpParserBaseVisitor<DeclarationResult>
 
                 declarations.Add(parameter);
                 statements.Add(expression);
-                _parserContext.Scope.Declare(parameter);
+                parserContext.Scope.Declare(parameter);
             }
         }
 

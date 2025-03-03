@@ -7,8 +7,8 @@ internal class TypeMap
 {
     private readonly ITypeLoader _typeLoader;
     private readonly TypeMap _parentTypeMap;
-    private readonly List<string> _namespaces = new List<string>();
-    private readonly Dictionary<string, string> _aliases = new Dictionary<string, string>();
+    private readonly List<string> _namespaces = new();
+    private readonly Dictionary<string, string> _aliases = new();
 
     public TypeMap(ITypeLoader typeLoader)
     {

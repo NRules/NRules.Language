@@ -16,7 +16,7 @@ public class RuleRepository : IRuleRepository
 {
     private readonly TypeLoader _loader;
     private readonly TypeMap _rootTypeMap;
-    private readonly RuleSet _defaultRuleSet = new RuleSet("Default");
+    private readonly RuleSet _defaultRuleSet = new("Default");
 
     /// <summary>
     /// Initializes a new instance of the <c>RuleRepository</c> class.
@@ -84,17 +84,15 @@ public class RuleRepository : IRuleRepository
     /// <exception cref="RulesParseException">Error while parsing the rules.</exception>
     public void Load(string fileName)
     {
-        using (var inputStream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+        using var inputStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+        try
         {
-            try
-            {
-                Load(inputStream);
-            }
-            catch (RulesParseException ce)
-            {
-                ce.Location.FileName = fileName;
-                throw;
-            }
+            Load(inputStream);
+        }
+        catch (RulesParseException ce)
+        {
+            ce.Location.FileName = fileName;
+            throw;
         }
     }
 

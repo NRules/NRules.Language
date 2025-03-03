@@ -1,15 +1,21 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="NRules.RuleModel" Version="1.0.1" />
-    <PackageVersion Include="NRules.Runtime" Version="1.0.1" />
+    <PackageVersion Include="NRules.RuleModel" Version="1.0.2" />
+    <PackageVersion Include="NRules.Runtime" Version="1.0.2" />
     <PackageVersion Include="Antlr4.CodeGenerator" Version="4.6.6" />
     <PackageVersion Include="Antlr4.Runtime" Version="4.6.6" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageVersion Include="xunit" Version="2.9.2" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+  </ItemGroup>
+
+  <!-- Locally built packages -->
+  <ItemGroup>
+    <PackageVersion Include="NRules.RuleSharp" Version="*" />
   </ItemGroup>
 </Project>
