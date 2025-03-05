@@ -1,6 +1,6 @@
 # Rule# - Language for NRules
 
-Rule# (Rule Sharp) is a business rules language for NRules rules engine.
+Rule# (Rule Sharp) is a business rules language for the [NRules](https://github.com/NRules/NRules) rules engine.
 
 [![Build status](https://img.shields.io/appveyor/build/NRules/NRules-Language)](https://ci.appveyor.com/project/NRules/NRules-Language) [![NuGet](https://img.shields.io/nuget/v/NRules.RuleSharp)](https://nuget.org/packages/NRules.RuleSharp) [![NRules on Stack Overflow](https://img.shields.io/stackexchange/stackoverflow/t/nrules)](http://stackoverflow.com/questions/tagged/nrules) [![NRules GitHub Discussions](https://img.shields.io/github/discussions/NRules/NRules)](https://github.com/NRules/NRules/discussions)
 
